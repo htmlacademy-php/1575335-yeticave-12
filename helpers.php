@@ -142,5 +142,15 @@ function include_template($name, array $data = []) {
 
     return $result;
 }
-
-
+/**
+* Возвращает отформатированную цену  товара (пробелы между тысячными разрядами) с добавлением знака Рубля (₽).
+* @param float $price Цена товара
+* @return string Отформатированная цена товара
+*/
+function format_price($price){
+	
+    $rounded = ceil($price);
+	
+    return number_format($rounded,0,"."," ") . " ₽";
+		
+}
