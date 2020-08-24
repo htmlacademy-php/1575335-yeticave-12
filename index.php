@@ -1,4 +1,6 @@
 <?php
+require './helpers.php';
+
 $is_auth = rand(0, 1);
 
 $user_name = 'Dinar'; // укажите здесь ваше имя
@@ -114,7 +116,7 @@ $items = [
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
-                            <span class="lot__cost"><?=$item['price'];?><b class="rub">р</b></span>
+                            <span class="lot__cost"><?=format_price($item['price']);?></span>
                         </div>
                         <div class="lot__timer timer">
                             12:23
