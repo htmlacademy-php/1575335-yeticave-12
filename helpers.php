@@ -147,10 +147,10 @@ function include_template($name, array $data = []) {
 * @param float $price Цена товара
 * @return string Отформатированная цена товара
 */
-function format_price($price){
+function format_price(float $price) : string {
 	
     $rounded = ceil($price);
 	
-    return number_format($rounded,0,"."," ") . " ₽";
+    return number_format($rounded,0,'.',' ') . ' ₽';
 		
 }
