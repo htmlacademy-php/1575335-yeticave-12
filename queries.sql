@@ -18,9 +18,6 @@ VALUES
 		('harambe@gmail.com', 'H@r@mb3', '6876db903aa3df51b6f357c188788fdfc270468eee79e9fcdaa82c7d09d85ca7', '6 feet under right now'),
 		('me@gmail.com', 'iam', '67e828614a0555c66632fabd139ca253e97feb8c9ea95fe667f8d24ec6657f24', 'pls dont contact me');
 		
-
-
-
 /*Создание лотов. Все цены указаны в копейках*/
 INSERT INTO lots (lot_name, img_url, starting_price, date_end, rate, author_id, winner, category_id)
 VALUES 
