@@ -5,27 +5,29 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Dinar'; // укажите здесь ваше имя
 
-$con = mysqli_connect ('localhost','root','root','yeti_cave_db');
+$connection = mysqli_connect('localhost','root','root','yeti_cave_db');
 
-if (!$con){
+$items = [];
+$categories = [];
+
+if (!$connection) {
     
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
     
-}
-else {
+} else {
         
-    mysqli_set_charset($con, "utf8");
+    mysqli_set_charset($connection, "utf8");
     
     $sql_categories = "SELECT name, symbol_code  FROM categories";
-    $categories_res = mysqli_query($con, $sql_categories);
+    $categories_res = mysqli_query($connection, $sql_categories);
     
     if ($categories_res) { 
     
         $categories = mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
-        
+    
     } else {
         
-        print ('Ошибка запроса: ' . mysqli_error($con));
+        print('Ошибка запроса: ' . mysqli_error($connection));
         
     }
     
@@ -36,15 +38,15 @@ else {
         WHERE date_end > CURDATE()
         GROUP BY lots.lot_id
         ORDER BY date_created DESC";
-    $items_res = mysqli_query($con, $sql_items);
+    $items_res = mysqli_query($connection, $sql_items);
     
-    if ($items_res ){ 
+    if ($items_res) { 
     
         $items = mysqli_fetch_all($items_res, MYSQLI_ASSOC);
         
     } else {
     
-        print ('Ошибка запроса: ' . mysqli_error($con));
+        print('Ошибка запроса: ' . mysqli_error($connection));
     
     }
     
