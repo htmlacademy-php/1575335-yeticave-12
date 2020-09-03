@@ -65,6 +65,13 @@ INNER JOIN users ON bids.user_id = users.user_id
 WHERE lot_id = ?
 ORDER BY date_time DESC;
 
+/*Изменение типа поля lot_description на TEXT, т.к. VARCHAR(255) не хватает*/
+ALTER TABLE lots
+MODIFY COLUMN lot_description TEXT
 
+/*Добавление плейсхолдера описания для лотов после изменения типа поля*/
+UPDATE lots 
+SET lot_description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris metus arcu, fermentum vitae feugiat id, pharetra a velit. Nunc eget egestas leo, et egestas augue. Nam vitae ex et arcu viverra accumsan. Aliquam scelerisque euismod enim ut rutrum. Maecenas eu scelerisque risus. In lectus neque, lobortis vitae lacus sit amet, euismod luctus dui. Vivamus id molestie orci, a scelerisque metus. Sed iaculis magna egestas lacinia sodales. Suspendisse interdum orci ut lacus tincidunt fringilla. In placerat magna tempus tempor pretium.'
+WHERE lot_id BETWEEN 1 AND 6 
 
 

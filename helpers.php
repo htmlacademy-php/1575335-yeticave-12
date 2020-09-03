@@ -186,3 +186,14 @@ function get_time_remaining (string $future_date) : ?array {
 	
     return null;
 }
+/**
+* Выставляет http заголовок 404, показывает страницу, адрес которой передан в функцию и останавливает дальнейшее выполнение сценария.
+* @param string $path относительный путь до страницы 404
+**/
+function send_status_404_page (string $path) : void {
+    
+    http_response_code(404); 
+    readfile($path);
+    die();
+     
+}
