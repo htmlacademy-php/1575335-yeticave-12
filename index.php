@@ -5,46 +5,53 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Dinar'; // укажите здесь ваше имя
 
-$categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
+$connection = mysqli_connect('localhost','root','root','yeti_cave_db');
 
-$items = [
-['name'=>'2014 Rossignol District Snowboard',
-'category'=> 'Доски и лыжи',
-'price'=>'10999',
-'img_url'=>'img/lot-1.jpg',
-'expiration_date'=>'2020-08-30'
-],
-['name'=>'DC Ply Mens 2016/2017 Snowboard',
-'category'=> 'Доски и лыжи',
-'price'=>'159999',
-'img_url'=>'img/lot-2.jpg',
-'expiration_date'=>'2020-08-29'
-],
-['name'=>'Крепления Union Contact Pro 2015 года размер L/XL',
-'category'=> 'Крепления',
-'price'=>'8000',
-'img_url'=>'img/lot-3.jpg',
-'expiration_date'=>'2020-08-31'
-],
-['name'=>'Ботинки для сноуборда DC Mutiny Charocal',
-'category'=> 'Ботинки',
-'price'=>'10999',
-'img_url'=>'img/lot-4.jpg',
-'expiration_date'=>'2020-08-28'
-],
-['name'=>'Куртка для сноуборда DC Mutiny Charocal',
-'category'=> 'Одежда',
-'price'=>'7500',
-'img_url'=>'img/lot-5.jpg',
-'expiration_date'=>'2020-09-01'
-],
-['name'=>'Маска Oakley Canopy',
-'category'=> 'Разное',
-'price'=>'5400',
-'img_url'=>'img/lot-6.jpg',
-'expiration_date'=>'2020-08-27'
-]
-];
+$items = [];
+$categories = [];
+
+if (!$connection) {
+    
+    print('Ошибка подключения к БД: ' . mysqli_connect_error());
+    
+} else {
+        
+    mysqli_set_charset($connection, "utf8");
+    
+    $sql_categories = "SELECT name, symbol_code  FROM categories";
+    $categories_res = mysqli_query($connection, $sql_categories);
+    
+    if ($categories_res) { 
+    
+        $categories = mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
+    
+    } else {
+        
+        print('Ошибка запроса: ' . mysqli_error($connection));
+        
+    }
+    
+    $sql_items = "SELECT lot_name AS 'name', cat.name AS 'category', img_url, starting_price AS 'price',  MAX(bid_price) AS 'bid_price' , date_end AS 'expiration_date' 
+        FROM lots 
+        INNER JOIN categories AS cat ON lots.category_id = cat.category_id
+        LEFT JOIN bids ON lots.lot_id = bids.lot_id
+        WHERE date_end > CURDATE()
+        GROUP BY lots.lot_id
+        ORDER BY date_created DESC";
+    $items_res = mysqli_query($connection, $sql_items);
+    
+    if ($items_res) { 
+    
+        $items = mysqli_fetch_all($items_res, MYSQLI_ASSOC);
+        
+    } else {
+    
+        print('Ошибка запроса: ' . mysqli_error($connection));
+    
+    }
+    
+}
+
 
 $page_content = include_template('/main.php', ['categories'=>$categories, 'items'=>$items ]);
 
