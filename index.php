@@ -31,7 +31,7 @@ if (!$connection) {
         
     }
     
-    $sql_items = "SELECT lot_name AS 'name', cat.name AS 'category', img_url, starting_price AS 'price',  MAX(bid_price) AS 'bid_price' , date_end AS 'expiration_date' 
+    $sql_items = "SELECT lots.lot_id, lot_name AS 'name', cat.name AS 'category', img_url, starting_price AS 'price',  MAX(bid_price) AS 'bid_price' , date_end AS 'expiration_date' 
         FROM lots 
         INNER JOIN categories AS cat ON lots.category_id = cat.category_id
         LEFT JOIN bids ON lots.lot_id = bids.lot_id
