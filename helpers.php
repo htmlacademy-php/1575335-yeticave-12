@@ -197,3 +197,119 @@ function send_status_404_page (string $path) : void {
     die();
      
 }
+/*
+* Функция проверки полей формы на пустоту, ничего не возвращает если поле не пустое.
+* @param string $field_name Имя поля
+* @return string Ошибка валидации
+**/
+function validate_filled($field_name) {
+    if (empty($_POST[$field_name])) {
+        return "Это поле должно быть заполнено";
+    }
+}
+/*
+* Функция валидации начальной цены лота, в случае успешной валидации ничего не возвращает.
+* @param string $field_name Имя поля
+* @return string Причина ошибки валидации
+**/
+function validate_starting_price ($field_name)  {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } else if (!is_numeric($_POST[$field_name])){
+        return 'Начальная цена должна быть числом';
+    } elseif ($_POST[$field_name] <=0) {
+        return 'Начальная цена должна быть больше нуля';
+    }
+}
+
+/*
+* Функция валидации даты окончания лота, в случае успешной валидации ничего не возвращает.
+* @param string $field_name Имя поля
+* @return string Причина ошибки валидации
+**/
+function validate_date_end ($field_name) {
+    $tomorrow_date = date_create('tomorrow');
+    
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } elseif(!is_date_valid($_POST[$field_name])) {
+        return 'Неккоректный формат даты';
+    } elseif (date_create($_POST[$field_name]) < $tomorrow_date) {
+        return 'Некорректная дата завершения лота';
+    }
+}
+
+/*
+* Функция валидации шага ставки, в случае успешной валидации (шаг ставки целое чило>0) ничего не возвращает.
+* @param string $field_name Имя поля
+* @return string Причина ошибки валидации
+**/
+function validate_step ($field_name) {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
+        return 'Шаг ставки должен быть целым числом';
+    } elseif ($_POST[$field_name] <= 0) {
+        return 'Шаг ставки должен быть больше ноля';
+    }
+}
+/* Функция валидации категории, если категория равна "Выберите категорию" валидация не пройдена.
+*  @param string $field_name Имя поля
+*  @return string Причина ошибки валидации
+**/
+function validate_category ($field_name) {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } elseif ($_POST[$field_name]=='Выберите категорию'){
+        return "Выберите категорию";
+    }
+}
+/*
+* Функция валидации изображенияизображения, в случае успешной валидации ничего не возвращает.
+* @param string $field_name Имя поля изображения
+* @param array $allowed_mime_type Массив строк с разрешенным MIME типами изображений
+* @return string Причина ошибки валидации
+**/
+function validate_image ($field_name, $allowed_mime_types) {
+  
+    if (isset($_FILES[$field_name])) {
+        if ($_FILES[$field_name]['error'] == 4)
+        {
+            return 'Добавьте изображение лота';
+        }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $path = $_FILES[$field_name]['tmp_name'];
+        $mime_type = mime_content_type($path);
+    
+        if (!in_array($mime_type, $allowed_mime_types)){
+            return 'Изображение должно быть в одном из следующих форматов: ' . implode( ", ", $allowed_mime_types);
+        }
+    }
+}
+/*
+* Сохраняет изображение в папку /uploads/ не изменяя имени файла.
+* @param field_name string Имя поля изображения
+* @return string|null Возвращает url сохраненного изображения или не возвращает ничего в случае ошибки
+**/
+function save_image ($field_name)  {
+    if (isset($_FILES[$field_name])) {
+        $file_name = $_FILES[$field_name]['name'];
+        $file_path = __DIR__ . '/uploads/';
+        $file_url = '/uploads/' . $file_name;
+    
+        if(move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name))
+        {
+            return $file_url;
+        }
+    }
+    return null;
+}
+
+/*
+* Функция для сохранения введенных в форме значений
+* @param string $field_name Имя поля формы
+* @return mixed Значение _POST если такой ключ есть 
+**/
+function get_post_val($field_name) {
+    return htmlspecialchars($_POST[$field_name] ?? "") ;
+}
