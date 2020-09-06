@@ -78,5 +78,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
     
 
-$page_content = include_template('/add-lot.php',['categories' => $categories, 'errors' => $errors]);
+$page_content = include_template('/add-lot.php', ['categories' => $categories, 'errors' => $errors]);
 print($page_content);
