@@ -197,7 +197,7 @@ function send_status_404_page(string $path) : void {
     die();
      
 }
-/*
+/**
 * Функция проверки полей формы на пустоту, ничего не возвращает если поле не пустое.
 * @param string $field_name Имя поля
 * @return string|null Ошибка валидации или null если ошибок нет
@@ -208,7 +208,7 @@ function validate_filled(string $field_name) : ?string{
     }
     return null;
 }
-/*
+/**
 * Функция валидации начальной цены лота, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
@@ -224,7 +224,7 @@ function validate_starting_price(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция валидации даты окончания лота, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
@@ -242,7 +242,7 @@ function validate_date_end(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция валидации шага ставки, в случае успешной валидации (шаг ставки целое чило>0) ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
@@ -269,8 +269,8 @@ function validate_category(string $field_name) {
     }
     return null;
 }
-/*
-* Функция валидации изображенияизображения, в случае успешной валидации ничего не возвращает.
+/**
+* Функция валидации изображения, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля изображения
 * @param array $allowed_mime_type Массив строк с разрешенным MIME типами изображений
 * @return string|null Причина ошибки валидации
@@ -292,7 +292,7 @@ function validate_image(string $field_name, array $allowed_mime_types) : ?string
     }
     return null;
 }
-/*
+/**
 * Сохраняет изображение в папку /uploads/ не изменяя имени файла.
 * @param field_name string Имя поля изображения
 * @return string|null Возвращает url сохраненного изображения или не возвращает ничего в случае ошибки
@@ -311,7 +311,7 @@ function save_image(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция для сохранения введенных в форме значений
 * @param string $field_name Имя поля формы
 * @return mixed Значение _POST если такой ключ есть 
@@ -319,3 +319,82 @@ function save_image(string $field_name) : ?string {
 function get_post_val(string $field_name) {
     return htmlspecialchars($_POST[$field_name] ?? "") ;
 }
+
+/**
+* Функция валидации имени пользователя
+* @param $field_name имя поля формы
+* @return string|null Ошибка валидации/ошибка подключения или не возвращает ничего
+**/
+function validate_username(string $field_name) : ?string {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } 
+    if (!$connection = mysqli_connect('localhost','root','root','yeti_cave_db')) {
+        
+        return 'Ошибка подключения к БД ' . mysqli_connect_error();
+        
+    } 
+    mysqli_set_charset($connection, "utf8");
+    $sql = "SELECT user_id, user_name FROM users WHERE user_name = ? LIMIT 1";
+    $prepared_sql = db_get_prepare_stmt($connection, $sql, [$_POST[$field_name]]);
+    if (!mysqli_stmt_execute($prepared_sql)){
+        
+       return 'Ошибка запроса к БД ' . mysqli_error($connection);
+    
+    } 
+    $result = mysqli_fetch_all(mysqli_stmt_get_result($prepared_sql), MYSQLI_ASSOC);
+    if (!empty($result)){
+        return 'Имя пользователя занято';
+        }
+        
+    return null;
+    
+}
+
+/**
+* Функция валидации пароля
+* @param string $field_name Имя поля формы
+* @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
+**/
+function validate_password(string $field_name) : ?string {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    } elseif (strlen($_POST[$field_name]) < 8) {
+        return 'Минимальная длина пароля 8 символов';
+    }
+    return null;
+}
+/**
+* Функция валидации адреса электронной почты
+* @param string $field_name Имя поля формы, в котором находится строка адреса
+* @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
+*
+**/
+function validate_email(string $field_name) : ?string {
+    if($empty = validate_filled($field_name)){
+        return $empty;
+    }
+    
+    if (!filter_var($_POST[$field_name],FILTER_VALIDATE_EMAIL)) {
+        return 'Введите корректный адрес электронной почты';      
+    }
+    
+    if (!$connection = mysqli_connect('localhost','root','root','yeti_cave_db')) {
+        return 'Ошибка подключения к БД ' . mysqli_connect_error();
+    } 
+    
+    mysqli_set_charset($connection, "utf8");
+    $sql = "SELECT user_id, email FROM users WHERE LOWER(email) = ? LIMIT 1";
+    $prepared_sql = db_get_prepare_stmt($connection, $sql, [$_POST[$field_name]]);
+    
+    if (!mysqli_stmt_execute($prepared_sql)){
+        return 'Ошибка запроса к БД' . mysqli_error($connection);
+    } 
+    
+    $result = mysqli_fetch_all(mysqli_stmt_get_result($prepared_sql), MYSQLI_ASSOC);
+    if (!empty($result)){
+        return 'Пользователь с таким email уже существует';
+    }
+    return null;
+}
+
