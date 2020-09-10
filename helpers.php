@@ -409,7 +409,7 @@ function get_categories(): array {
             return [];
     }
     mysqli_set_charset($connection, "utf8");
-    $sql_categories = "SELECT name, symbol_code  FROM categories";
+    $sql_categories = "SELECT category_id, name, symbol_code  FROM categories";
     $categories_res = mysqli_query($connection, $sql_categories);
     
     if (!$categories_res) { 
