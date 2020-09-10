@@ -1,29 +1,17 @@
 <?php
 require './helpers.php';
+$is_auth = rand(0, 1);
+
+$user_name = 'Dinar'; 
 
 $connection = mysqli_connect('localhost','root','root','yeti_cave_db');
-$categories = [];
+$categories = get_categories();
 $errors = [];
 if (!$connection) {
     
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
     
-} else {
-    
-    mysqli_set_charset($connection, "utf8");
-    $sql_categories = "SELECT category_id, name, symbol_code  FROM categories";
-    $res_categories = mysqli_query($connection, $sql_categories);
-    if ($res_categories) { 
-    
-        $categories = mysqli_fetch_all($res_categories, MYSQLI_ASSOC);
-    
-    } else {
-        
-        print('Ошибка запроса: ' . mysqli_error($connection));
-        
-    }
-}
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $required_fields = ['lot-name', 'category', 'message', 'lot-rate', 'lot-step', 'lot-date' ];
     $rules = [
@@ -58,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $errors = array_filter($errors);
     
-    if(count($errors)== 0 && $connection && isset($categories) && $file_url = save_image('lot-img')){
+    if (count($errors)== 0 && $connection && isset($categories) && $file_url = save_image('lot-img')){
         
         $sql_add_lot = "INSERT INTO lots (lot_name, lot_description, img_url, date_end, starting_price, rate, author_id, category_id) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -79,4 +67,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
 
 $page_content = include_template('/add-lot.php', ['categories' => $categories, 'errors' => $errors]);
-print($page_content);
+$layout_content = include_template('/layout.php', ['content' =>$page_content, 'title' => 'Добавление лота' ,'categories' => $categories, 'is_auth' => $is_auth, 'user_name' => $user_name, 'third_css' => true]); 
+print($layout_content);
