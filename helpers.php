@@ -13,7 +13,7 @@
  *
  * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
  */
-function is_date_valid(string $date) : bool {
+function is_date_valid(string $date): bool {
     $format_to_check = 'Y-m-d';
     $dateTimeObj = date_create_from_format($format_to_check, $date);
 
@@ -147,7 +147,7 @@ function include_template($name, array $data = []) {
 * @param float $price Цена товара
 * @return string Отформатированная цена товара
 */
-function format_price(float $price) : string {
+function format_price(float $price): string {
 	
     $rounded = ceil($price);
 	
@@ -161,9 +161,9 @@ function format_price(float $price) : string {
 * @return array|null Возвращает массив строк в формате [ЧЧ, ММ] или ничего не возращает если входной параметр имеет неверный формат.
 */
 
-function get_time_remaining(string $future_date) : ?array {
+function get_time_remaining(string $future_date): ?array {
 	
-	if(is_date_valid($future_date))
+	if (is_date_valid($future_date))
     {
         $current_date = strtotime('now');
         $future_date = strtotime($future_date);
@@ -171,7 +171,7 @@ function get_time_remaining(string $future_date) : ?array {
         $hours = floor($diff/3600);
         $minutes = ceil(($diff%3600)/60);
         
-        if($minutes == 60)
+        if ($minutes == 60)
         {
             $hours += 1;
             $minutes = 0;
@@ -190,31 +190,31 @@ function get_time_remaining(string $future_date) : ?array {
 * Выставляет http заголовок 404, показывает страницу, адрес которой передан в функцию и останавливает дальнейшее выполнение сценария.
 * @param string $path относительный путь до страницы 404
 **/
-function send_status_404_page(string $path) : void {
+function send_status_404_page(string $path): void {
     
     http_response_code(404); 
     readfile($path);
     die();
      
 }
-/*
+/**
 * Функция проверки полей формы на пустоту, ничего не возвращает если поле не пустое.
 * @param string $field_name Имя поля
 * @return string|null Ошибка валидации или null если ошибок нет
 **/
-function validate_filled(string $field_name) : ?string{
+function validate_filled(string $field_name): ?string{
     if (empty($_POST[$field_name])) {
         return "Это поле должно быть заполнено";
     }
     return null;
 }
-/*
+/**
 * Функция валидации начальной цены лота, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
 **/
-function validate_starting_price(string $field_name) : ?string {
-    if($empty = validate_filled($field_name)){
+function validate_starting_price(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
         return $empty;
     } else if (!is_numeric($_POST[$field_name])){
         return 'Начальная цена должна быть числом';
@@ -224,17 +224,17 @@ function validate_starting_price(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция валидации даты окончания лота, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
 **/
-function validate_date_end(string $field_name) : ?string {
+function validate_date_end(string $field_name): ?string {
     $tomorrow_date = date_create('tomorrow');
     
-    if($empty = validate_filled($field_name)){
+    if ($empty = validate_filled($field_name)){
         return $empty;
-    } elseif(!is_date_valid($_POST[$field_name])) {
+    } elseif (!is_date_valid($_POST[$field_name])) {
         return 'Неккоректный формат даты';
     } elseif (date_create($_POST[$field_name]) < $tomorrow_date) {
         return 'Некорректная дата завершения лота';
@@ -242,13 +242,13 @@ function validate_date_end(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция валидации шага ставки, в случае успешной валидации (шаг ставки целое чило>0) ничего не возвращает.
 * @param string $field_name Имя поля
 * @return string|null Причина ошибки валидации или null если ошибок нет
 **/
-function validate_step(string $field_name) : ?string {
-    if($empty = validate_filled($field_name)){
+function validate_step(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом';
@@ -261,21 +261,21 @@ function validate_step(string $field_name) : ?string {
 *  @param string $field_name Имя поля
 *  @return string|null Причина ошибки валидации или null если ошибок нет
 **/
-function validate_category(string $field_name) {
-    if($empty = validate_filled($field_name)){
+function validate_category(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
         return $empty;
     } elseif ($_POST[$field_name]=='Выберите категорию'){
         return "Выберите категорию";
     }
     return null;
 }
-/*
-* Функция валидации изображенияизображения, в случае успешной валидации ничего не возвращает.
+/**
+* Функция валидации изображения, в случае успешной валидации ничего не возвращает.
 * @param string $field_name Имя поля изображения
 * @param array $allowed_mime_type Массив строк с разрешенным MIME типами изображений
 * @return string|null Причина ошибки валидации
 **/
-function validate_image(string $field_name, array $allowed_mime_types) : ?string {
+function validate_image(string $field_name, array $allowed_mime_types): ?string {
   
     if (isset($_FILES[$field_name])) {
         if ($_FILES[$field_name]['error'] == 4)
@@ -292,18 +292,18 @@ function validate_image(string $field_name, array $allowed_mime_types) : ?string
     }
     return null;
 }
-/*
+/**
 * Сохраняет изображение в папку /uploads/ не изменяя имени файла.
-* @param field_name string Имя поля изображения
+* @param string $field_name Имя поля изображения
 * @return string|null Возвращает url сохраненного изображения или не возвращает ничего в случае ошибки
 **/
-function save_image(string $field_name) : ?string {
+function save_image(string $field_name): ?string {
     if (isset($_FILES[$field_name])) {
         $file_name = $_FILES[$field_name]['name'];
         $file_path = __DIR__ . '/uploads/';
         $file_url = '/uploads/' . $file_name;
     
-        if(move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name))
+        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name))
         {
             return $file_url;
         }
@@ -311,11 +311,109 @@ function save_image(string $field_name) : ?string {
     return null;
 }
 
-/*
+/**
 * Функция для сохранения введенных в форме значений
 * @param string $field_name Имя поля формы
 * @return mixed Значение _POST если такой ключ есть 
 **/
 function get_post_val(string $field_name) {
-    return htmlspecialchars($_POST[$field_name] ?? "") ;
+    return htmlspecialchars($_POST[$field_name] ?? "");
+}
+
+/**
+* Функция валидации имени пользователя
+* @param string $field_name имя поля формы
+* @return string|null Ошибка валидации/ошибка подключения или не возвращает ничего
+**/
+function validate_username(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
+        return $empty;
+    } 
+    if (!$connection = mysqli_connect('localhost','root','root','yeti_cave_db')) {
+        
+        return 'Ошибка подключения к БД ' . mysqli_connect_error();
+        
+    } 
+    mysqli_set_charset($connection, "utf8");
+    $sql = "SELECT user_id, user_name FROM users WHERE user_name = ? LIMIT 1";
+    $prepared_sql = db_get_prepare_stmt($connection, $sql, [$_POST[$field_name]]);
+    if (!mysqli_stmt_execute($prepared_sql)){
+        
+       return 'Ошибка запроса к БД ' . mysqli_error($connection);
+    
+    } 
+    $result = mysqli_fetch_all(mysqli_stmt_get_result($prepared_sql), MYSQLI_ASSOC);
+    if (!empty($result)){
+        return 'Имя пользователя занято';
+        }
+        
+    return null;
+    
+}
+
+/**
+* Функция валидации пароля
+* @param string $field_name Имя поля формы
+* @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
+**/
+function validate_password(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
+        return $empty;
+    } elseif (strlen($_POST[$field_name]) < 8) {
+        return 'Минимальная длина пароля 8 символов';
+    }
+    return null;
+}
+/**
+* Функция валидации адреса электронной почты
+* @param string $field_name Имя поля формы, в котором находится строка адреса
+* @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
+*
+**/
+function validate_email(string $field_name): ?string {
+    if ($empty = validate_filled($field_name)){
+        return $empty;
+    }
+    
+    if (!filter_var($_POST[$field_name],FILTER_VALIDATE_EMAIL)) {
+        return 'Введите корректный адрес электронной почты';      
+    }
+    
+    if (!$connection = mysqli_connect('localhost','root','root','yeti_cave_db')) {
+        return 'Ошибка подключения к БД ' . mysqli_connect_error();
+    } 
+    
+    mysqli_set_charset($connection, "utf8");
+    $sql = "SELECT user_id, email FROM users WHERE LOWER(email) = ? LIMIT 1";
+    $prepared_sql = db_get_prepare_stmt($connection, $sql, [$_POST[$field_name]]);
+    
+    if (!mysqli_stmt_execute($prepared_sql)){
+        return 'Ошибка запроса к БД' . mysqli_error($connection);
+    } 
+    
+    $result = mysqli_fetch_all(mysqli_stmt_get_result($prepared_sql), MYSQLI_ASSOC);
+    if (!empty($result)){
+        return 'Пользователь с таким email уже существует';
+    }
+    return null;
+}
+
+/**
+* Функция получения списка категорий из базы данных
+* @return array Возвращает двумерный массив категорий, в случае ошибки возвращает пустой массив
+**/
+function get_categories(): array {
+    $connection = mysqli_connect('localhost','root','root','yeti_cave_db');
+    if (!$connection)
+    {
+            return [];
+    }
+    mysqli_set_charset($connection, "utf8");
+    $sql_categories = "SELECT category_id, name, symbol_code  FROM categories";
+    $categories_res = mysqli_query($connection, $sql_categories);
+    
+    if (!$categories_res) { 
+        return [];
+    }
+    return $categories = mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
 }
