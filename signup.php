@@ -40,7 +40,7 @@ if (!$connection) {
     $errors = array_filter($errors);
 
     if (empty($errors)) {
-
+        mysqli_set_charset($connection, "utf8");
         $sql_new_user = "INSERT INTO users (email, user_name, password, contacts) VALUES (?, ?, ?, ?)";
         $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $prepared_sql = db_get_prepare_stmt($connection, $sql_new_user,

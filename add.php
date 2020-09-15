@@ -55,6 +55,8 @@ if (!$connection) {
 
         $sql_add_lot = "INSERT INTO lots (lot_name, lot_description, img_url, date_end, starting_price, rate, author_id, category_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        mysqli_set_charset($connection, "utf8");
         $prepared_sql = db_get_prepare_stmt($connection, $sql_add_lot, [
             $_POST['lot-name'],
             $_POST['message'],

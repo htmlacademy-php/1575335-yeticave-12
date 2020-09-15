@@ -25,7 +25,7 @@ INNER JOIN categories as cat
 ON lots.category_id = cat.category_id
 WHERE lot_id = ?";
 
-
+    mysqli_set_charset($connection, "utf8");
     $lot_prepared = db_get_prepare_stmt($connection, $sql_lot, [$lot_id]);
     mysqli_stmt_execute($lot_prepared);
     $result = mysqli_stmt_get_result($lot_prepared);

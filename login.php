@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $errors = array_filter($errors);
     if (empty($errors)) {
+        mysqli_set_charset($connection, "utf8");
         $sql_authenticate = "SELECT user_id, user_name, email, password FROM users
         WHERE email = ? LIMIT 1";
         $prepared_sql = db_get_prepare_stmt($connection, $sql_authenticate, [strtolower($_POST['email'])]);
