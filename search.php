@@ -32,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         AGAINST(?)
         ORDER BY date_created DESC
         LIMIT ?
-        OFFSET ?
-        ";
+        OFFSET ?";
 
         $sql_num_items = "SELECT FOUND_ROWS()";
         $search_result = db_get_prepare_stmt($connection, $sql_search, [$search, $limit, $offset]);
