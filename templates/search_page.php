@@ -25,17 +25,17 @@
                                     class="lot__cost"><?= htmlspecialchars(format_price($item['starting_price'] / 100)) ?></span>
                             </div>
                             <?php if ($remaining_time[0] == '00' && $remaining_time[1] == '00'): ?>
-                            <div class="lot__timer timer">
-                                Торги окончены
-                            </div>
+                                <div class="lot__timer timer">
+                                    Торги окончены
+                                </div>
                             <?php else: ?>
-                            <div class="lot__timer timer
+                                <div class="lot__timer timer
                             <?php if ($remaining_time[0] == '00'): ?>
                                 timer--finishing
                             <?php endif; ?>
                                 ">
-                                <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
-                            </div>
+                                    <?= $remaining_time[0] . ':' . $remaining_time[1] ?>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -43,20 +43,20 @@
             <?php endforeach; ?>
         </ul>
     </section>
-    <?php if(!empty($pages) && !empty($items)): ?>
-    <ul class="pagination-list">
+    <?php if (!empty($pages) && !empty($items)): ?>
+        <ul class="pagination-list">
 
-        <li class="pagination-item pagination-item-prev">
-            <?= isset($pages[0]) ? "<a href=\"search.php?search=$search_query&page=$pages[0]\">Назад</a>" : "<a style=\"visibility:hidden\">Назад</a>" ?>
-        </li>
-        <?php for ($i = 1; $i <= $num_pages; $i++): ?>
-            <li class="pagination-item <?= $i == $pages[1] ? "pagination-item-active" : "" ?>">
-                <a <?= $i != $pages[1] ? "href=\"search.php?search=$search_query&page=$i\"" : "" ?> ><?= $i ?></a>
+            <li class="pagination-item pagination-item-prev">
+                <?= isset($pages[0]) ? "<a href=\"search.php?search=$search_query&page=$pages[0]\">Назад</a>" : "<a style=\"visibility:hidden\">Назад</a>" ?>
             </li>
-        <?php endfor; ?>
-        <li class="pagination-item pagination-item-next">
-            <?= isset($pages[2]) ? "<a href=\"search.php?search=$search_query&page=$pages[2]\">Вперед</a>" : "<a style=\"visibility:hidden\">Вперед</a>" ?>
-        </li>
-    </ul>
-    <?php endif;?>
+            <?php for ($i = 1; $i <= $num_pages; $i++): ?>
+                <li class="pagination-item <?= $i == $pages[1] ? "pagination-item-active" : "" ?>">
+                    <a <?= $i != $pages[1] ? "href=\"search.php?search=$search_query&page=$i\"" : "" ?> ><?= $i ?></a>
+                </li>
+            <?php endfor; ?>
+            <li class="pagination-item pagination-item-next">
+                <?= isset($pages[2]) ? "<a href=\"search.php?search=$search_query&page=$pages[2]\">Вперед</a>" : "<a style=\"visibility:hidden\">Вперед</a>" ?>
+            </li>
+        </ul>
+    <?php endif; ?>
 </div>
