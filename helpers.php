@@ -165,7 +165,7 @@ function format_price(float $price): string
 /**
  * Возвращает оставшееся до переданной в функцию даты время в виде массива [ЧЧ, ММ]
  * @param string $future_date Конечная дата в формате 'ГГГГ-ММ-ДД'
- * @return array|null Возвращает массив строк в формате [ЧЧ, ММ] или ничего не возращает если входной параметр имеет неверный формат.
+ * @return array|null Возвращает массив строк в формате [ЧЧ, ММ] или ничего не возращает если входной параметр имеет неверный формат, если конечная дата в прошлом, возвращает ['00', '00'].
  */
 
 function get_time_remaining(string $future_date): ?array
@@ -175,6 +175,9 @@ function get_time_remaining(string $future_date): ?array
         $current_date = strtotime('now');
         $future_date = strtotime($future_date);
         $diff = $future_date - $current_date;
+        if ($diff < 0) {
+            return ['00', '00'];
+        }
         $hours = floor($diff / 3600);
         $minutes = ceil(($diff % 3600) / 60);
 
