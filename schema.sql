@@ -57,4 +57,6 @@ CREATE TABLE bids (
 		REFERENCES lots(lot_id)
 	);
 
-	
+CREATE FULLTEXT 
+INDEX lot_ft_search
+ON lots(lot_name, lot_description); 
