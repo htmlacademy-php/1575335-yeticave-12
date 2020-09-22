@@ -20,7 +20,7 @@
             </a>
             <form class="main-header__search" method="get" action="search.php" autocomplete="off">
                 <input type="search" name="search"
-                       placeholder="Поиск лота" <?= isset($search_query) ? "value=\"$search_query\"" : "" ?>>
+                       placeholder="Поиск лота" <?= isset($search_query) ? "value=\"$search_query\"" : "" ?> >
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти">
             </form>
             <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
@@ -29,7 +29,7 @@
                 <?php if ($is_auth): ?>
                     <div class="user-menu__logged">
                         <p><?= $user_name ?></p>
-                        <a class="user-menu__bets" href="pages/my-bets.html">Мои ставки</a>
+                        <a class="user-menu__bets" href="mybids.php">Мои ставки</a>
                         <a class="user-menu__logout" href="logout.php">Выход</a>
                     </div>
                 <?php else : ?>

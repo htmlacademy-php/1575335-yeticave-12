@@ -462,3 +462,65 @@ function validate_email_login(string $field_name): ?string
     }
     return null;
 }
+
+/**
+ * Функция валидации ставки лота
+ * @param string $field_name Имя поля формы
+ * @param int $min_bid Минимальный размер ставки
+ * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
+ **/
+function validate_bid(string $field_name, int $min_bid): ?string
+{
+    if ($empty = validate_filled($field_name)) {
+        return $empty;
+    } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
+        return 'Шаг ставки должен быть целым числом больше ноля';
+    } elseif ($_POST[$field_name] < $min_bid / 100) {
+        return 'Ставка должна быть больше минимальной ставки';
+    }
+
+    return null;
+}
+
+/**
+ * Функция возвращает разницу во времени между переданной датой и
+ * текущим временем в человекочитаемом формате (если разница не более 12 часов)
+ * @param string $date Дата время в формате ['ГГГГ-ММ-ДД ЧЧ:ММ:СС']
+ * @return string|null дата в виде %h часов назад/%m минут назад или дата в исходном формате если разница 12 часов,
+ * null в случае неверного формата
+ **/
+function human_readable_datetime(string $date): ?string
+{
+    $current_time = date_create();
+    $input_time = date_create_from_format('Y-m-d H:i:s', $date);
+    if (!$input_time) {
+        return null;
+    }
+    $difference = date_diff($current_time, $input_time);
+    $format = [];
+
+    if ($difference->d !== 0 || $difference->m !== 0 || $difference->y !== 0 || $difference->h > 12) {
+        return $input_time->format('d.m.y в H:i:s');
+    }
+
+    if ($difference->h !== 0) {
+        $format[] = "%h " . get_noun_plural_form($difference->h, 'час', 'часа', 'часов');
+    }
+
+    if ($difference->i !== 0) {
+        $format[] = "%i " . get_noun_plural_form($difference->i, 'минуту', 'минуты', 'минут');
+    }
+
+    if ($difference->s !== 0) {
+        if (count($format) == 0) {
+            return "Меньше минуты назад";
+        }
+    }
+
+    if ($difference->format('%d.%m.%y %H:%i:%s') === "0.0.0 00:0:0") {
+        return "Только что";
+    }
+
+    $format = array_shift($format) . ' назад';
+    return $difference->format($format);
+}
