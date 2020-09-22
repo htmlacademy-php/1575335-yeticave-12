@@ -3,7 +3,7 @@
         <h2><?php if (!empty($items)): ?>
                 Результаты поиска по запросу «<span><?= $search_query ?? '' ?></span>»
             <?php else: ?>
-                Ничего не найдено по вашему запросу
+                По Вашему запросу <?= empty($search_query) ? "" :"\"$search_query\"" ?> ничего не найдено
             <?php endif; ?>
         </h2>
         <ul class="lots__list">
