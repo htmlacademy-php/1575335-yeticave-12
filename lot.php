@@ -15,9 +15,7 @@ $title = 'Информация о лоте';
 $lot_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
 if (is_null($lot_id)) {
-
     send_status_404_page('pages/404.html');
-
 }
 
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
@@ -39,32 +37,24 @@ mysqli_stmt_execute($lot_prepared);
 $result = mysqli_stmt_get_result($lot_prepared);
 
 if (mysqli_num_rows($result) !== 0) {
-
     $lot_result = mysqli_fetch_assoc($result);
     $title = $lot_result['lot_name'] ?? "Информация о лоте";
     $lot_result['current_price'] = $lot_result['current_price'] ?? $lot_result['starting_price'];
     $lot_result['min_bid'] = $lot_result['current_price'] + $lot_result['rate'];
+
     if (isset($lot_result['date_end'])) {
-
         $remaining_time = get_time_remaining($lot_result['date_end']);
-
     } else {
-
         $remaining_time = ['00', '00'];
-
     }
     if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
         $lot_result['lot_closed'] = true;
     }
 } else {
-
     send_status_404_page('pages/404.html');
-
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
     $min_bid = $lot_result['min_bid'];
     $rules = [
         'cost' => function () use (&$min_bid) {
@@ -81,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors = array_filter($errors);
 
     if (empty($errors) && isset($_SESSION['user_logged_in']) && time() < strtotime($lot_result['date_end'])) {
-
         $bid = filter_input(INPUT_POST, 'cost', FILTER_SANITIZE_NUMBER_INT);
         $sql_bid = "INSERT INTO bids (bid_price, user_id, lot_id)
         VALUES (?, ?, ?)";

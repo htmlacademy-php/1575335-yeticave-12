@@ -10,11 +10,8 @@ $items = [];
 $categories = get_categories();
 
 if (!$connection) {
-
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
-
 } else {
-
     mysqli_set_charset($connection, "utf8");
     $sql_items = "SELECT lots.lot_id, lot_name AS 'name', cat.name AS 'category', img_url, starting_price AS 'price',  MAX(bid_price) AS 'bid_price' , date_end AS 'expiration_date'
         FROM lots
@@ -26,17 +23,11 @@ if (!$connection) {
     $items_res = mysqli_query($connection, $sql_items);
 
     if ($items_res) {
-
         $items = mysqli_fetch_all($items_res, MYSQLI_ASSOC);
-
     } else {
-
         print('Ошибка запроса: ' . mysqli_error($connection));
-
     }
-
 }
-
 
 $page_content = include_template('/main.php', ['categories' => $categories, 'items' => $items]);
 

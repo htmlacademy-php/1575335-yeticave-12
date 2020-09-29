@@ -155,11 +155,9 @@ function include_template($name, array $data = [])
  */
 function format_price(float $price): string
 {
-
     $rounded = ceil($price);
 
     return number_format($rounded, 0, '.', ' ') . ' ₽';
-
 }
 
 /**
@@ -170,7 +168,6 @@ function format_price(float $price): string
 
 function get_time_remaining(string $future_date): ?array
 {
-
     if (is_date_valid($future_date)) {
         $current_date = strtotime('now');
         $future_date = strtotime($future_date);
@@ -192,7 +189,6 @@ function get_time_remaining(string $future_date): ?array
 
         return [$hours, $minutes];
     }
-
     return null;
 }
 
@@ -202,7 +198,6 @@ function get_time_remaining(string $future_date): ?array
  **/
 function send_status_404_page(string $path): void
 {
-
     http_response_code(404);
     readfile($path);
     die();
@@ -299,7 +294,6 @@ function validate_category(string $field_name): ?string
  **/
 function validate_image(string $field_name, array $allowed_mime_types): ?string
 {
-
     if (isset($_FILES[$field_name])) {
         if ($_FILES[$field_name]['error'] == 4) {
             return 'Добавьте изображение лота';
@@ -355,25 +349,19 @@ function validate_username(string $field_name): ?string
         return $empty;
     }
     if (!$connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db')) {
-
         return 'Ошибка подключения к БД ' . mysqli_connect_error();
-
     }
     mysqli_set_charset($connection, "utf8");
     $sql = "SELECT user_id, user_name FROM users WHERE user_name = ? LIMIT 1";
     $prepared_sql = db_get_prepare_stmt($connection, $sql, [$_POST[$field_name]]);
     if (!mysqli_stmt_execute($prepared_sql)) {
-
         return 'Ошибка запроса к БД ' . mysqli_error($connection);
-
     }
     $result = mysqli_fetch_all(mysqli_stmt_get_result($prepared_sql), MYSQLI_ASSOC);
     if (!empty($result)) {
         return 'Имя пользователя занято';
     }
-
     return null;
-
 }
 
 /**

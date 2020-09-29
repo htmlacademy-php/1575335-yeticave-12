@@ -14,8 +14,8 @@ $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
 if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
 }
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $limit = 9;
     $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT) ?? 1;
     $offset = ($page - 1) * $limit;
@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $search = trim($search);
 
     if (strlen($search) > 0) {
-
         $sql_search = "SELECT SQL_CALC_FOUND_ROWS lot_id, date_created, lot_name, img_url, starting_price, date_end, cats.name AS category
         FROM lots
         LEFT JOIN categories AS cats

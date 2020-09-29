@@ -13,9 +13,7 @@ if (!$is_auth) {
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
 
 if (!$connection) {
-
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
-
 }
 
 mysqli_set_charset($connection, "utf8");
@@ -31,7 +29,6 @@ ORDER BY date_time DESC";
 $sql_result = mysqli_query($connection, $sql_mybids);
 
 if ($sql_result) {
-
     $mybids = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
     foreach ($mybids as &$bid) {
         if ($bid['winner'] == $_SESSION['user_id']) {
@@ -45,9 +42,7 @@ if ($sql_result) {
     }
     unset($bid);
 } else {
-
     print('Ошибка запроса ' . mysqli_error($connection));
-
 }
 
 
