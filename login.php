@@ -5,7 +5,6 @@ session_start();
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in']) {
     header("Location: /index.php");
     die();
-
 }
 
 $categories = get_categories();
@@ -15,7 +14,6 @@ if (!$connection) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
@@ -33,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     $errors = array_filter($errors);
+
     if (empty($errors)) {
         mysqli_set_charset($connection, "utf8");
         $sql_authenticate = "SELECT user_id, user_name, email, password FROM users
@@ -53,8 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             die();
         }
     }
-
-
 }
 
 $page_content = include_template('/login_page.php', ['errors' => $errors]);
