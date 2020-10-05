@@ -3,10 +3,10 @@
     <table class="rates__list">
         <?php foreach ($mybids as $bid): ?>
             <tr class="rates__item
-      <?php if (isset($bid['lot_closed']) && $bid['lot_closed']): ?>
-      rates__item--end
-      <?php elseif (isset($bid['winner']) && $bid['winner']): ?>
+      <?php if (isset($bid['winner']) && $bid['winner']): ?>
       rates__item--win
+      <?php elseif (isset($bid['lot_closed']) && $bid['lot_closed']): ?>
+      rates__item--end
       <?php endif; ?>">
                 <td class="rates__info">
                     <div class="rates__img">
