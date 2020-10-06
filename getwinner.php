@@ -6,7 +6,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
-$winners_info = [];
+
 if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
 } else {
@@ -15,10 +15,10 @@ if (!$connection) {
     $sql_find_winners = "SELECT a.bid_id, a.lot_id, a.user_id, a.date_time, a.bid_price, users.user_name, users.email, lots.lot_name
 FROM bids a
 INNER JOIN (
-	SELECT lot_id, MAX(bid_price) AS bid_price, MAX(date_time) AS date_time
+	SELECT lot_id, MAX(date_time) AS date_time
 	FROM bids
 	GROUP BY lot_id) AS b
-ON a.lot_id = b.lot_id AND a.bid_price = b.bid_price AND a.date_time = b.date_time
+ON a.lot_id = b.lot_id AND a.date_time = b.date_time
 LEFT JOIN lots
 ON lots.lot_id = a.lot_id
 LEFT JOIN users
@@ -38,7 +38,9 @@ ORDER BY bid_id";
             ->setPassword($_ENV['MAILTRAP_PASSWORD']);
         $mailer = new Swift_Mailer($transport);
         $message = (new Swift_Message('Ваша ставка победила'))
-            ->setFrom(['keks@phpdemo.ru' => 'Keks']);
+            ->setFrom(['keks@phpdemo.ru' => 'Keks'])
+            ->setContentType('text/html');
+
 
         foreach ($winners_info as $winner) {
             $sql_update_winners = "UPDATE lots
@@ -53,7 +55,6 @@ WHERE lot_id = ${winner['lot_id']}";
                     'lot_name' => $winner['lot_name'],
                 ]);
                 $message->setTo([$winner['email'] => $winner['user_name']])
-                    ->setContentType('text/html')
                     ->setBody($mail_content);
                 $result = $mailer->send($message);
             }
