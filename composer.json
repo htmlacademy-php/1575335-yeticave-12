@@ -1,0 +1,15 @@
+{
+    "name": "fetgea/yeticave",
+    "description": "Auction site project",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Dinar Gabdrakhmanov",
+            "email": "fetgea@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.0",
+        "vlucas/phpdotenv": "^5.2"
+    }
+}
