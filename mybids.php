@@ -31,21 +31,22 @@ $sql_result = mysqli_query($connection, $sql_mybids);
 if ($sql_result) {
     $mybids = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
     foreach ($mybids as &$bid) {
-        if ($bid['winner'] == $_SESSION['user_id']) {
-            $bid['winner'] = true;
+        if (isset ($bid['winner']) && intval($bid['winner']) === $_SESSION['user_id']) {
+            $bid['is_winner'] = true;
         }
-        $remaining_time = get_time_remaining($bid['date_end']);
-        $bid['remaining_time'] = $remaining_time;
-        if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
-            $bid['lot_closed'] = true;
+        if(isset($bid['date_end'])) {
+            $remaining_time = get_time_remaining($bid['date_end']);
+            $bid['remaining_time'] = $remaining_time;
+
+            if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
+                $bid['lot_closed'] = true;
+            }
         }
     }
     unset($bid);
 } else {
     print('Ошибка запроса ' . mysqli_error($connection));
 }
-
-
 $page_content = include_template('/my_bids_page.php', ['mybids' => $mybids]);
 $layout_content = include_template('/layout.php', [
     'content' => $page_content,

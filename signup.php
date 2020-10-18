@@ -10,7 +10,7 @@ $categories = get_categories();
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
 if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
@@ -43,11 +43,10 @@ if (!$connection) {
             [strtolower($_POST['email']), $_POST['name'], $password_hash, $_POST['message']]);
 
         if (mysqli_stmt_execute($prepared_sql)) {
-            header("Location: /pages/login.html");
+            header("Location: /login.php");
             die();
-        } else {
-            print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
         }
+        print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
     }
 }
 

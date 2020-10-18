@@ -178,7 +178,7 @@ function get_time_remaining(string $future_date): ?array
         $hours = floor($diff / 3600);
         $minutes = ceil(($diff % 3600) / 60);
 
-        if ($minutes == 60) {
+        if ($minutes === 60) {
             $hours += 1;
             $minutes = 0;
         }
@@ -226,13 +226,12 @@ function validate_starting_price(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
-    } else {
-        if (!is_numeric($_POST[$field_name])) {
-            return 'Начальная цена должна быть числом';
-        } elseif ($_POST[$field_name] <= 0) {
-            return 'Начальная цена должна быть больше нуля';
-        }
+    } elseif (!is_numeric($_POST[$field_name])) {
+        return 'Начальная цена должна быть числом';
+    } elseif ($_POST[$field_name] <= 0) {
+        return 'Начальная цена должна быть больше нуля';
     }
+
     return null;
 }
 
@@ -272,15 +271,16 @@ function validate_step(string $field_name): ?string
     return null;
 }
 
-/* Функция валидации категории, если категория равна "Выберите категорию" валидация не пройдена.
-*  @param string $field_name Имя поля
-*  @return string|null Причина ошибки валидации или null если ошибок нет
-**/
+/**
+ *  Функция валидации категории, если категория равна "Выберите категорию" валидация не пройдена.
+ * @param string $field_name Имя поля
+ * @return string|null Причина ошибки валидации или null если ошибок нет
+ **/
 function validate_category(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
-    } elseif ($_POST[$field_name] == 'Выберите категорию') {
+    } elseif ($_POST[$field_name] === 'Выберите категорию') {
         return "Выберите категорию";
     }
     return null;
@@ -295,7 +295,7 @@ function validate_category(string $field_name): ?string
 function validate_image(string $field_name, array $allowed_mime_types): ?string
 {
     if (isset($_FILES[$field_name])) {
-        if ($_FILES[$field_name]['error'] == 4) {
+        if ($_FILES[$field_name]['error'] === 4) {
             return 'Добавьте изображение лота';
         }
         finfo_open(FILEINFO_MIME_TYPE);
@@ -431,7 +431,7 @@ function get_categories(): array
     if (!$categories_res) {
         return [];
     }
-    return $categories = mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
+    return mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
 }
 
 /**
@@ -500,7 +500,7 @@ function human_readable_datetime(string $date): ?string
     }
 
     if ($difference->s !== 0) {
-        if (count($format) == 0) {
+        if (count($format) === 0) {
             return "Меньше минуты назад";
         }
     }
@@ -511,4 +511,26 @@ function human_readable_datetime(string $date): ?string
 
     $format = array_shift($format) . ' назад';
     return $difference->format($format);
+}
+
+/**
+ * Функция возвращает массив номеров страниц для навигации
+ * @param int $page номер текущей страницы
+ * @param int $num_pages общее количество страниц
+ * @return array массив вида [предыдущая страница, текущая страница, следующая страница],
+ * предыдущая страница и слудующая страница могут быть null, в случае отсутствия страниц вовзращает пустой массив
+ */
+function get_nav_pages(int $page, int $num_pages): array
+{
+    if ($num_pages <= 1) {
+        return [];
+    }
+    switch ($page) {
+        case $num_pages:
+            return [$page - 1, $page, null];
+        case 1:
+            return [null, $page, $page + 1];
+        default:
+            return [$page - 1, $page, $page + 1];
+    }
 }

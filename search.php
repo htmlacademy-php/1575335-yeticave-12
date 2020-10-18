@@ -43,22 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $result = mysqli_stmt_get_result($search_result);
         $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
         $num_items = mysqli_fetch_assoc(mysqli_query($connection, $sql_num_items));
-        $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
-
-        switch ($page) {
-            case $num_pages:
-                $pages = [$page - 1, $page, null];
-                break;
-            case 1:
-                $pages = [null, $page, $page + 1];
-                break;
-            default:
-                $pages = [$page - 1, $page, $page + 1];
-                break;
+        if (isset($num_items['FOUND_ROWS()'])) {
+            $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
         }
-        if ($num_pages <= 1) {
-            $pages = [];
-        }
+        $pages = get_nav_pages($page,$num_pages);
     }
 }
 

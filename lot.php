@@ -54,8 +54,10 @@ if (mysqli_num_rows($result) !== 0) {
     send_status_404_page('pages/404.html');
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $min_bid = $lot_result['min_bid'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset ($lot_result['min_bid'])) {
+        $min_bid = $lot_result['min_bid'];
+    }
     $rules = [
         'cost' => function () use (&$min_bid) {
             return validate_bid('cost', $min_bid);
@@ -70,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $errors = array_filter($errors);
 
-    if (empty($errors) && isset($_SESSION['user_logged_in']) && time() < strtotime($lot_result['date_end'])) {
+    if (empty($errors) && $is_auth && isset($_SESSION['user_id']) && isset ($lot_result['date_end']) && time() < strtotime($lot_result['date_end'])) {
         $bid = filter_input(INPUT_POST, 'cost', FILTER_SANITIZE_NUMBER_INT);
         $sql_bid = "INSERT INTO bids (bid_price, user_id, lot_id)
         VALUES (?, ?, ?)";
@@ -90,15 +92,15 @@ INNER JOIN users ON bids.user_id = users.user_id
 WHERE lot_id = ?
 ORDER BY date_time DESC
 LIMIT 10";
-$all_bid_prepared = db_get_prepare_stmt($connection, $sql_all_bids, [$lot_id]);
-mysqli_stmt_execute($all_bid_prepared);
-$all_bid_result = mysqli_stmt_get_result($all_bid_prepared);
+$all_bids_prepared = db_get_prepare_stmt($connection, $sql_all_bids, [$lot_id]);
+mysqli_stmt_execute($all_bids_prepared);
+$all_bids_result = mysqli_stmt_get_result($all_bids_prepared);
 
-if (mysqli_num_rows($all_bid_result) != 0) {
-    $all_bids = mysqli_fetch_all($all_bid_result, MYSQLI_ASSOC);
+if (mysqli_num_rows($all_bids_result) !== 0) {
+    $all_bids = mysqli_fetch_all($all_bids_result, MYSQLI_ASSOC);
 }
 
-if (!isset($_SESSION['user_logged_in']) || strtotime($lot_result['date_end']) < time() || $lot_result['author_id'] === $_SESSION['user_id'] || isset($all_bids[0]['user_id']) && $all_bids[0]['user_id'] === $_SESSION['user_id']) {
+if (!$is_auth || (isset ($lot_result['date_end']) && strtotime($lot_result['date_end']) < time()) || (isset ($lot_result['author_id']) && $lot_result['author_id'] === $_SESSION['user_id']) || (isset($all_bids[0]['user_id']) && $all_bids[0]['user_id'] === $_SESSION['user_id'])) {
     $show_bids = false;
 }
 

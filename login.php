@@ -13,7 +13,7 @@ if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {

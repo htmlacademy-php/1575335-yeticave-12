@@ -26,11 +26,7 @@ ON a.user_id = users.user_id
 WHERE winner IS NULL AND lots.date_end <= CURDATE()
 ORDER BY bid_id";
 
-    $winners_info = mysqli_query($connection, $sql_find_winners);
-
-    if ($winners_info) {
-        $winners_info = mysqli_fetch_all($winners_info, MYSQLI_ASSOC);
-    }
+    $winners_info = mysqli_fetch_all(mysqli_query($connection, $sql_find_winners), MYSQLI_ASSOC);
 
     if (!empty($winners_info)) {
         $transport = (new Swift_SmtpTransport('smtp.mailtrap.io', 465, 'tls'))
@@ -41,12 +37,12 @@ ORDER BY bid_id";
             ->setFrom(['keks@phpdemo.ru' => 'Keks'])
             ->setContentType('text/html');
 
-
         foreach ($winners_info as $winner) {
             $sql_update_winners = "UPDATE lots
 SET winner = ${winner['user_id']}
 WHERE lot_id = ${winner['lot_id']}";
             $update_winner = mysqli_query($connection, $sql_update_winners);
+
             if ($update_winner) {
                 $mail_content = include_template('/email.php', [
                     'user_name' => $winner['user_name'],
