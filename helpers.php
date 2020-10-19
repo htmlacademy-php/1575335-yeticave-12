@@ -294,17 +294,16 @@ function validate_category(string $field_name): ?string
  **/
 function validate_image(string $field_name, array $allowed_mime_types): ?string
 {
-    if (isset($_FILES[$field_name])) {
-        if ($_FILES[$field_name]['error'] === 4) {
-            return 'Добавьте изображение лота';
-        }
-        finfo_open(FILEINFO_MIME_TYPE);
-        $path = $_FILES[$field_name]['tmp_name'];
-        $mime_type = mime_content_type($path);
 
-        if (!in_array($mime_type, $allowed_mime_types)) {
-            return 'Изображение должно быть в одном из следующих форматов: ' . implode(", ", $allowed_mime_types);
-        }
+    if (!isset($_FILES[$field_name]) || $_FILES[$field_name]['error'] === 4) {
+        return 'Добавьте изображение лота';
+    }
+    finfo_open(FILEINFO_MIME_TYPE);
+    $path = $_FILES[$field_name]['tmp_name'];
+    $mime_type = mime_content_type($path);
+
+    if (!in_array($mime_type, $allowed_mime_types)) {
+        return 'Изображение должно быть в одном из следующих форматов: ' . implode(", ", $allowed_mime_types);
     }
     return null;
 }

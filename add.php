@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_logged_in'])) {
     die();
 }
 
-$is_auth = $_SESSION['user_logged_in'] ?? false;
+$is_auth = $_SESSION['user_logged_in'];
 $user_name = $_SESSION['user_name'] ?? "";
 $user_id = $_SESSION['user_id'] ?? 0;
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
