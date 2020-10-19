@@ -40,9 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($prepared_sql);
         $prepared_res = mysqli_stmt_get_result($prepared_sql);
         $result = mysqli_fetch_all($prepared_res, MYSQLI_ASSOC);
-        if (empty($result)) {
-            $errors['password'] = 'Вы ввели неверный email/пароль';
-        } elseif (!password_verify($_POST['password'], $result[0]['password'])) {
+        if (empty($result) || !password_verify($_POST['password'], $result[0]['password'])) {
             $errors['password'] = 'Вы ввели неверный email/пароль';
         } else {
             $_SESSION['user_logged_in'] = true;
