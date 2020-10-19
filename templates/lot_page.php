@@ -41,7 +41,7 @@
                         <p class="lot-item__form-item form__item <?= !empty($errors) ? "form__item--invalid" : "" ?>">
                             <label for="cost">Ваша ставка</label>
                             <input id="cost" type="text" name="cost"
-                                   placeholder="<?= htmlspecialchars(($lot['min_bid'] ?? 0) / 100) ?>">
+                                   placeholder="<?= htmlspecialchars(format_price(($lot['min_bid'] ?? 0) / 100)) ?>">
                             <span class="form__error"><?= $errors['cost'] ?? '' ?></span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>
