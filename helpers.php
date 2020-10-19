@@ -498,10 +498,8 @@ function human_readable_datetime(string $date): ?string
         $format[] = "%i " . get_noun_plural_form($difference->i, 'минуту', 'минуты', 'минут');
     }
 
-    if ($difference->s !== 0) {
-        if (count($format) === 0) {
-            return "Меньше минуты назад";
-        }
+    if ($difference->s !== 0 && count($format) === 0) {
+        return "Меньше минуты назад";
     }
 
     if ($difference->format('%d.%m.%y %H:%i:%s') === "0.0.0 00:0:0") {
