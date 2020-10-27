@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
-            return validate_email_login('email');
+            return login_email_validation_errors('email');
         },
         'password' => function () {
             return validate_filled('password');
@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['password'] = 'Вы ввели неверный email/пароль';
         } else {
             $_SESSION['user_logged_in'] = true;
-            $_SESSION['user_name'] = $result[0]['user_name'];
-            $_SESSION['user_id'] = $result[0]['user_id'];
+            $_SESSION['user_name'] = $result[0]['user_name'] ?? "Error username";
+            $_SESSION['user_id'] = $result[0]['user_id'] ?? -1;
             header("Location: /index.php");
             die();
         }

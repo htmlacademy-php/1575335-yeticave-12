@@ -175,8 +175,8 @@ function get_time_remaining(string $future_date): ?array
         if ($diff < 0) {
             return ['00', '00'];
         }
-        $hours = floor($diff / 3600);
-        $minutes = ceil(($diff % 3600) / 60);
+        $hours = (int)floor($diff / 3600);
+        $minutes = (int)ceil(($diff % 3600) / 60);
 
         if ($minutes === 60) {
             $hours += 1;
@@ -222,7 +222,7 @@ function validate_filled(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_starting_price(string $field_name): ?string
+function starting_price_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -240,7 +240,7 @@ function validate_starting_price(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_date_end(string $field_name): ?string
+function date_end_validation_errors(string $field_name): ?string
 {
     $tomorrow_date = date_create('tomorrow');
 
@@ -259,13 +259,13 @@ function validate_date_end(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_step(string $field_name): ?string
+function step_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом';
-    } elseif ($_POST[$field_name] <= 0) {
+    } elseif ((int)$_POST[$field_name] <= 0) {
         return 'Шаг ставки должен быть больше ноля';
     }
     return null;
@@ -276,7 +276,7 @@ function validate_step(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_category(string $field_name): ?string
+function lot_category_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -292,10 +292,10 @@ function validate_category(string $field_name): ?string
  * @param array $allowed_mime_types Массив строк с разрешенным MIME типами изображений
  * @return string|null Причина ошибки валидации
  **/
-function validate_image(string $field_name, array $allowed_mime_types): ?string
+function image_validation_errors(string $field_name, array $allowed_mime_types): ?string
 {
 
-    if (!isset($_FILES[$field_name]) || $_FILES[$field_name]['error'] === 4) {
+    if (!isset($_FILES[$field_name]) || !isset($_FILES[$field_name]['tmp_name']) || (isset($_FILES[$field_name]['error']) && $_FILES[$field_name]['error'] === 4)) {
         return 'Добавьте изображение лота';
     }
     finfo_open(FILEINFO_MIME_TYPE);
@@ -315,12 +315,12 @@ function validate_image(string $field_name, array $allowed_mime_types): ?string
  **/
 function save_image(string $field_name): ?string
 {
-    if (isset($_FILES[$field_name])) {
+    if (isset($_FILES[$field_name]) && isset($_FILES[$field_name]['name'])) {
         $file_name = $_FILES[$field_name]['name'];
         $file_path = __DIR__ . '/uploads/';
         $file_url = '/uploads/' . $file_name;
 
-        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
+        if (isset($_FILES[$field_name]['tmp_name']) && move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
             return $file_url;
         }
     }
@@ -342,7 +342,7 @@ function get_post_val(string $field_name)
  * @param string $field_name имя поля формы
  * @return string|null Ошибка валидации/ошибка подключения или не возвращает ничего
  **/
-function validate_username(string $field_name): ?string
+function username_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -368,7 +368,7 @@ function validate_username(string $field_name): ?string
  * @param string $field_name Имя поля формы
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  **/
-function validate_password(string $field_name): ?string
+function password_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -384,7 +384,7 @@ function validate_password(string $field_name): ?string
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  *
  **/
-function validate_email(string $field_name): ?string
+function email_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -438,7 +438,7 @@ function get_categories(): array
  * @param string $field_name Имя поля формы, в котором находится строка адреса
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  */
-function validate_email_login(string $field_name): ?string
+function login_email_validation_errors(string $field_name): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
@@ -456,13 +456,13 @@ function validate_email_login(string $field_name): ?string
  * @param int $min_bid Минимальный размер ставки
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  **/
-function validate_bid(string $field_name, int $min_bid): ?string
+function bid_validation_errors(string $field_name, int $min_bid): ?string
 {
     if ($empty = validate_filled($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом больше ноля';
-    } elseif ($_POST[$field_name] < $min_bid / 100) {
+    } elseif ((int)$_POST[$field_name] * 100 < $min_bid) {
         return 'Ставка должна быть больше минимальной ставки';
     }
 

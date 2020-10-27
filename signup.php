@@ -14,13 +14,13 @@ if (!$connection) {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
-            return validate_email('email');
+            return email_validation_errors('email');
         },
         'password' => function () {
-            return validate_password('password');
+            return password_validation_errors('password');
         },
         'name' => function () {
-            return validate_username('name');
+            return username_validation_errors('name');
         },
         'message' => function () {
             return validate_filled('message');

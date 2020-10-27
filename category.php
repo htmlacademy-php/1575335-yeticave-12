@@ -25,7 +25,11 @@ if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
 } else {
     $limit = 9;
-    $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT) ?? 1;
+    $page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT);
+    if(!$page || !isset($page))
+    {
+        $page =1;
+    }
     $offset = ($page - 1) * $limit;
 
     mysqli_set_charset($connection, "utf8");
@@ -48,8 +52,9 @@ OFFSET ?";
     mysqli_stmt_execute($items_prepared);
     $result = mysqli_stmt_get_result($items_prepared);
     $num_items = mysqli_fetch_assoc(mysqli_query($connection, $sql_num_items));
-    $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
-
+    if(isset($num_items['FOUND_ROWS()'])) {
+        $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
+    }
     if (mysqli_num_rows($result) !== 0) {
         $items_result = mysqli_fetch_all($result, MYSQLI_ASSOC);
         foreach ($items_result as &$item) {

@@ -28,7 +28,7 @@ ORDER BY bid_id";
 
     $winners_info = mysqli_fetch_all(mysqli_query($connection, $sql_find_winners), MYSQLI_ASSOC);
 
-    if (!empty($winners_info)) {
+    if (!empty($winners_info) && isset($_ENV['MAILTRAP_LOGIN']) && isset($_ENV['MAILTRAP_PASSWORD'])) {
         $transport = (new Swift_SmtpTransport('smtp.mailtrap.io', 465, 'tls'))
             ->setUsername($_ENV['MAILTRAP_LOGIN'])
             ->setPassword($_ENV['MAILTRAP_PASSWORD']);
@@ -38,12 +38,14 @@ ORDER BY bid_id";
             ->setContentType('text/html');
 
         foreach ($winners_info as $winner) {
-            $sql_update_winners = "UPDATE lots
+            if (isset(winner['user_id']) && isset(winner['lot_id'])) {
+                $sql_update_winners = "UPDATE lots
 SET winner = ${winner['user_id']}
 WHERE lot_id = ${winner['lot_id']}";
+            }
             $update_winner = mysqli_query($connection, $sql_update_winners);
 
-            if ($update_winner) {
+            if ($update_winner && isset($winner['user_name'], $_SERVER['SERVER_NAME'], $winner['lot_id'], $winner['lot_name'], $winner['email'])) {
                 $mail_content = include_template('/email.php', [
                     'user_name' => $winner['user_name'],
                     'host' => $_SERVER['SERVER_NAME'],

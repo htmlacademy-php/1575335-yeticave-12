@@ -4,6 +4,7 @@ require './helpers.php';
 session_start();
 $is_auth = $_SESSION['user_logged_in'] ?? false;
 $user_name = $_SESSION['user_name'] ?? "";
+$user_id = $_SESSION['user_id'] ?? -1;
 $categories = get_categories();
 $mybids = [];
 if (!$is_auth) {
@@ -22,7 +23,7 @@ FROM bids
 LEFT JOIN lots ON bids.lot_id = lots.lot_id
 LEFT JOIN users ON lots.author_id = users.user_id
 LEFT JOIN categories ON lots.category_id = categories.category_id
-WHERE bids.user_id = ${_SESSION['user_id']}
+WHERE bids.user_id = ${user_id}
 GROUP BY bids.lot_id
 ORDER BY date_time DESC";
 
@@ -31,14 +32,14 @@ $sql_result = mysqli_query($connection, $sql_mybids);
 if ($sql_result) {
     $mybids = mysqli_fetch_all($sql_result, MYSQLI_ASSOC);
     foreach ($mybids as &$bid) {
-        if (isset ($bid['winner']) && intval($bid['winner']) === $_SESSION['user_id']) {
+        if (isset ($bid['winner']) && (int)$bid['winner'] === $user_id) {
             $bid['is_winner'] = true;
         }
-        if(isset($bid['date_end'])) {
+        if (isset($bid['date_end'])) {
             $remaining_time = get_time_remaining($bid['date_end']);
             $bid['remaining_time'] = $remaining_time;
 
-            if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
+            if (isset($remaining_time[0], $remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00') {
                 $bid['lot_closed'] = true;
             }
         }

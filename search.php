@@ -17,11 +17,17 @@ if (!$connection) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $limit = 9;
-    $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT) ?? 1;
+    $page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT);
+    if(!$page || !isset($page)){
+        $page = 1;
+    }
     $offset = ($page - 1) * $limit;
-    $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) ?? "";
-    $search = trim($search);
-
+    $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
+    if(!$search || !isset($search)){
+        $search = "";
+    } else {
+        $search = trim($search);
+    }
     if (strlen($search) > 0) {
         $sql_search = "SELECT SQL_CALC_FOUND_ROWS lot_id, date_created, lot_name, img_url, starting_price, date_end, cats.name AS category
         FROM lots

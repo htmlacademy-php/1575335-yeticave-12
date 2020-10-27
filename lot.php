@@ -12,9 +12,9 @@ $all_bids = [];
 $show_bids = true;
 $remaining_time = ['00', '00'];
 $title = 'Информация о лоте';
-$lot_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$lot_id = (int)filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
-if (is_null($lot_id)) {
+if (!$lot_id || !isset($lot_id)) {
     send_status_404_page('pages/404.html');
 }
 
@@ -39,7 +39,10 @@ $result = mysqli_stmt_get_result($lot_prepared);
 if (mysqli_num_rows($result) !== 0) {
     $lot_result = mysqli_fetch_assoc($result);
     $title = $lot_result['lot_name'] ?? "Информация о лоте";
-    $lot_result['current_price'] = $lot_result['current_price'] ?? $lot_result['starting_price'];
+    if (!isset($lot_result['current_price']) && isset($lot_result['starting_price']))
+    {
+        $lot_result['current_price'] = $lot_result['starting_price'];
+    }
     $lot_result['min_bid'] = $lot_result['current_price'] + $lot_result['rate'];
 
     if (isset($lot_result['date_end'])) {
@@ -47,7 +50,7 @@ if (mysqli_num_rows($result) !== 0) {
     } else {
         $remaining_time = ['00', '00'];
     }
-    if ($remaining_time[0] === '00' && $remaining_time[1] === '00') {
+    if (isset($remaining_time[0],$remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00') {
         $lot_result['lot_closed'] = true;
     }
 } else {
@@ -60,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $rules = [
         'cost' => function () use (&$min_bid) {
-            return validate_bid('cost', $min_bid);
+            return bid_validation_errors('cost', $min_bid);
         }
     ];
 
