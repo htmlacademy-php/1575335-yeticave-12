@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 $is_auth = $_SESSION['user_logged_in'] ?? false;
@@ -26,9 +27,8 @@ if (!$connection) {
 } else {
     $limit = 9;
     $page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT);
-    if(!$page || !isset($page))
-    {
-        $page =1;
+    if (!$page || !isset($page)) {
+        $page = 1;
     }
     $offset = ($page - 1) * $limit;
 
@@ -52,7 +52,7 @@ OFFSET ?";
     mysqli_stmt_execute($items_prepared);
     $result = mysqli_stmt_get_result($items_prepared);
     $num_items = mysqli_fetch_assoc(mysqli_query($connection, $sql_num_items));
-    if(isset($num_items['FOUND_ROWS()'])) {
+    if (isset($num_items['FOUND_ROWS()'])) {
         $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
     }
     if (mysqli_num_rows($result) !== 0) {

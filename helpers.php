@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
  *
@@ -163,7 +164,7 @@ function format_price(float $price): string
 /**
  * Возвращает оставшееся до переданной в функцию даты время в виде массива [ЧЧ, ММ]
  * @param string $future_date Конечная дата в формате 'ГГГГ-ММ-ДД'
- * @return array|null Возвращает массив строк в формате [ЧЧ, ММ] или ничего не возращает если входной параметр имеет неверный формат, если конечная дата в прошлом, возвращает ['00', '00'].
+ * @return array|null Возвращает массив строк в формате [ЧЧ, ММ], если конечная дата в прошлом, возвращает ['00', '00']. Ничего не возращает если входной параметр имеет неверный формат.
  */
 
 function get_time_remaining(string $future_date): ?array
@@ -201,7 +202,6 @@ function send_status_404_page(string $path): void
     http_response_code(404);
     readfile($path);
     die();
-
 }
 
 /**
@@ -209,7 +209,7 @@ function send_status_404_page(string $path): void
  * @param string $field_name Имя поля
  * @return string|null Ошибка валидации или null если ошибок нет
  **/
-function validate_filled(string $field_name): ?string
+function required_field_validation_errors(string $field_name): ?string
 {
     if (empty($_POST[$field_name])) {
         return "Это поле должно быть заполнено";
@@ -224,7 +224,7 @@ function validate_filled(string $field_name): ?string
  **/
 function starting_price_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name])) {
         return 'Начальная цена должна быть числом';
@@ -244,7 +244,7 @@ function date_end_validation_errors(string $field_name): ?string
 {
     $tomorrow_date = date_create('tomorrow');
 
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_date_valid($_POST[$field_name])) {
         return 'Неккоректный формат даты';
@@ -261,7 +261,7 @@ function date_end_validation_errors(string $field_name): ?string
  **/
 function step_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом';
@@ -278,7 +278,7 @@ function step_validation_errors(string $field_name): ?string
  **/
 function lot_category_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif ($_POST[$field_name] === 'Выберите категорию') {
         return "Выберите категорию";
@@ -294,7 +294,6 @@ function lot_category_validation_errors(string $field_name): ?string
  **/
 function image_validation_errors(string $field_name, array $allowed_mime_types): ?string
 {
-
     if (!isset($_FILES[$field_name]) || !isset($_FILES[$field_name]['tmp_name']) || (isset($_FILES[$field_name]['error']) && $_FILES[$field_name]['error'] === 4)) {
         return 'Добавьте изображение лота';
     }
@@ -311,20 +310,21 @@ function image_validation_errors(string $field_name, array $allowed_mime_types):
 /**
  * Сохраняет изображение в папку /uploads/ не изменяя имени файла.
  * @param string $field_name Имя поля изображения
- * @return string|null Возвращает url сохраненного изображения или не возвращает ничего в случае ошибки
+ * @return string|false Возвращает url сохраненного изображения или возвращает false в случае ошибки
  **/
-function save_image(string $field_name): ?string
+function save_image(string $field_name)
 {
     if (isset($_FILES[$field_name]) && isset($_FILES[$field_name]['name'])) {
         $file_name = $_FILES[$field_name]['name'];
         $file_path = __DIR__ . '/uploads/';
         $file_url = '/uploads/' . $file_name;
 
-        if (isset($_FILES[$field_name]['tmp_name']) && move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
+        if (isset($_FILES[$field_name]['tmp_name']) && move_uploaded_file($_FILES[$field_name]['tmp_name'],
+                $file_path . $file_name)) {
             return $file_url;
         }
     }
-    return null;
+    return false;
 }
 
 /**
@@ -344,7 +344,7 @@ function get_post_val(string $field_name)
  **/
 function username_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
     if (!$connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db')) {
@@ -370,7 +370,7 @@ function username_validation_errors(string $field_name): ?string
  **/
 function password_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (strlen($_POST[$field_name]) < 8) {
         return 'Минимальная длина пароля 8 символов';
@@ -386,7 +386,7 @@ function password_validation_errors(string $field_name): ?string
  **/
 function email_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
 
@@ -440,7 +440,7 @@ function get_categories(): array
  */
 function login_email_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
 
@@ -458,12 +458,12 @@ function login_email_validation_errors(string $field_name): ?string
  **/
 function bid_validation_errors(string $field_name, int $min_bid): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом больше ноля';
     } elseif ((int)$_POST[$field_name] * 100 < $min_bid) {
-        return 'Ставка должна быть больше минимальной ставки';
+        return 'Ставка должна быть больше или равна минимальной ставке';
     }
 
     return null;

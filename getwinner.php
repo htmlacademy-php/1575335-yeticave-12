@@ -38,14 +38,15 @@ ORDER BY bid_id";
             ->setContentType('text/html');
 
         foreach ($winners_info as $winner) {
-            if (isset(winner['user_id']) && isset(winner['lot_id'])) {
-                $sql_update_winners = "UPDATE lots
+            if (!isset($winner['user_name'], $_SERVER['SERVER_NAME'], $winner['lot_id'], $winner['lot_name'], $winner['email'], $winner['user_id'], $winner['lot_id'])) {
+                continue;
+            }
+            $sql_update_winners = "UPDATE lots
 SET winner = ${winner['user_id']}
 WHERE lot_id = ${winner['lot_id']}";
-            }
             $update_winner = mysqli_query($connection, $sql_update_winners);
 
-            if ($update_winner && isset($winner['user_name'], $_SERVER['SERVER_NAME'], $winner['lot_id'], $winner['lot_name'], $winner['email'])) {
+            if ($update_winner) {
                 $mail_content = include_template('/email.php', [
                     'user_name' => $winner['user_name'],
                     'host' => $_SERVER['SERVER_NAME'],

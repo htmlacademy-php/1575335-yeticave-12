@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in']) {
@@ -23,7 +24,7 @@ if (!$connection) {
             return username_validation_errors('name');
         },
         'message' => function () {
-            return validate_filled('message');
+            return required_field_validation_errors('message');
         }
     ];
 

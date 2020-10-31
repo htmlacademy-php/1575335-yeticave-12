@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 $errors = [];
 session_start();
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return login_email_validation_errors('email');
         },
         'password' => function () {
-            return validate_filled('password');
+            return required_field_validation_errors('password');
         }
     ];
 
@@ -42,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = mysqli_fetch_all($prepared_res, MYSQLI_ASSOC);
         if (empty($result) || !password_verify($_POST['password'], $result[0]['password'])) {
             $errors['password'] = 'Вы ввели неверный email/пароль';
-        } else {
+        } elseif (isset($result[0]['user_name'], $result[0]['user_id'])) {
             $_SESSION['user_logged_in'] = true;
-            $_SESSION['user_name'] = $result[0]['user_name'] ?? "Error username";
-            $_SESSION['user_id'] = $result[0]['user_id'] ?? -1;
+            $_SESSION['user_name'] = $result[0]['user_name'];
+            $_SESSION['user_id'] = $result[0]['user_id'];
             header("Location: /index.php");
             die();
         }

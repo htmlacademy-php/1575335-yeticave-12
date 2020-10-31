@@ -39,8 +39,7 @@ $result = mysqli_stmt_get_result($lot_prepared);
 if (mysqli_num_rows($result) !== 0) {
     $lot_result = mysqli_fetch_assoc($result);
     $title = $lot_result['lot_name'] ?? "Информация о лоте";
-    if (!isset($lot_result['current_price']) && isset($lot_result['starting_price']))
-    {
+    if (!isset($lot_result['current_price']) && isset($lot_result['starting_price'])) {
         $lot_result['current_price'] = $lot_result['starting_price'];
     }
     $lot_result['min_bid'] = $lot_result['current_price'] + $lot_result['rate'];
@@ -50,7 +49,7 @@ if (mysqli_num_rows($result) !== 0) {
     } else {
         $remaining_time = ['00', '00'];
     }
-    if (isset($remaining_time[0],$remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00') {
+    if (isset($remaining_time[0], $remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00') {
         $lot_result['lot_closed'] = true;
     }
 } else {

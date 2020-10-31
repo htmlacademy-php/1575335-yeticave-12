@@ -29,11 +29,11 @@
                                 <?php endif; ?>
                             </div>
                             <div class="lot-item__timer timer
-                        <?php if (isset($item['remaining_time']) && isset($item['remaining_time'][0]) && isset($item['remaining_time'][1]) && $item['remaining_time'][0] === '00'): ?>
+                        <?php if (isset($item['remaining_time']) && isset($item['remaining_time'][0], $item['remaining_time'][1]) && $item['remaining_time'][0] === '00'): ?>
                         timer--finishing
                         <?php endif; ?>
                         ">
-                                <?= (isset($item['remaining_time'][0]) && isset($item['remaining_time'][1])) ? $item['remaining_time'][0] . ":" . $item['remaining_time'][1] : "Ошибка : Времени" ?>
+                                <?= (isset($item['remaining_time'][0], $item['remaining_time'][1])) ? $item['remaining_time'][0] . ":" . $item['remaining_time'][1] : "Ошибка : Времени" ?>
                             </div>
                         </div>
                 </li>

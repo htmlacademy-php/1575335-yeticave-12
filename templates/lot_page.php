@@ -22,7 +22,7 @@
         timer--finishing
         <?php endif; ?>
         ">
-                        <?= (isset($remaining_time[0]) && isset($remaining_time[1])) ? $remaining_time[0] . ":" . $remaining_time[1] : 'Ошибка : Времени' ?>
+                        <?= (isset($remaining_time[0], $remaining_time[1])) ? $remaining_time[0] . ":" . $remaining_time[1] : 'Ошибка : Времени' ?>
                     </div>
                 <?php endif; ?>
                 <div class="lot-item__cost-state">

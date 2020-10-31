@@ -8,7 +8,7 @@
         </h2>
         <ul class="lots__list">
             <?php foreach ($items as $item): ?>
-                <?php $remaining_time = get_time_remaining($item['date_end']) ?>
+                <?php isset($item['date_end']) ? $remaining_time = get_time_remaining($item['date_end']) : $remaining_time = ['00', '00'] ?>
                 <li class="lots__item lot">
                     <div class="lot__image">
                         <img src="../<?= htmlspecialchars($item['img_url'] ?? 'img/placeholder.jpg') ?>" width="350"
@@ -25,7 +25,7 @@
                                 <span
                                     class="lot__cost"><?= htmlspecialchars(format_price(($item['starting_price'] ?? 0) / 100)) ?></span>
                             </div>
-                            <?php if (isset($remaining_time[0]) && isset($remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00'): ?>
+                            <?php if (isset($remaining_time[0], $remaining_time[1]) && $remaining_time[0] === '00' && $remaining_time[1] === '00'): ?>
                                 <div class="lot__timer timer">
                                     Торги окончены
                                 </div>

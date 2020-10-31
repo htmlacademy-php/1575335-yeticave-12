@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 $is_auth = $_SESSION['user_logged_in'] ?? false;
@@ -41,4 +42,4 @@ $layout_content = include_template('/layout.php', [
 ]);
 
 print($layout_content);
-require_once ('getwinner.php');
+require_once('getwinner.php');

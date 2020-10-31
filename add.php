@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 if (!isset($_SESSION['user_logged_in'])) {
@@ -18,13 +19,13 @@ if (!$connection) {
     $required_fields = ['lot-name', 'category', 'message', 'lot-rate', 'lot-step', 'lot-date'];
     $rules = [
         'lot-name' => function () {
-            return validate_filled('lot-name');
+            return required_field_validation_errors('lot-name');
         },
         'category' => function () {
             return lot_category_validation_errors('category');
         },
         'message' => function () {
-            return validate_filled('message');
+            return required_field_validation_errors('message');
         },
         'lot-rate' => function () {
             return starting_price_validation_errors('lot-rate');
@@ -47,7 +48,7 @@ if (!$connection) {
     $errors['lot-img'] = image_validation_errors('lot-img', ['image/png', 'image/jpeg']);
     $errors = array_filter($errors);
 
-    if ($connection && isset($categories) && count($errors) === 0 &&  $file_url = save_image('lot-img')) {
+    if ($connection && isset($categories) && count($errors) === 0 && $file_url = save_image('lot-img')) {
         mysqli_set_charset($connection, "utf8");
 
         $sql_add_lot = "INSERT INTO lots (lot_name, lot_description, img_url, date_end, starting_price, rate, author_id, category_id)

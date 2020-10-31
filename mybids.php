@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 
 session_start();

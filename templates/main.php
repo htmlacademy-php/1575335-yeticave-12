@@ -19,7 +19,7 @@
     <ul class="lots__list">
         <!--заполните этот список из массива с товарами-->
         <?php foreach ($items as $item): ?>
-            <?php $remaining_time = get_time_remaining($item['expiration_date']) ?>
+            <?php isset($item['expiration_date']) ? $remaining_time = get_time_remaining($item['expiration_date']) : $remaining_time = ['00', '00'] ?>
             <li class="lots__item lot">
                 <div class="lot__image">
                     <img src="<?= htmlspecialchars($item['img_url'] ?? '#') ?>" width="350" height="260" alt="">
@@ -40,7 +40,7 @@
                         timer--finishing
                         <?php endif; ?>
                         ">
-                            <?= (isset($remaining_time[0]) && isset($remaining_time[1])) ? $remaining_time[0] . ':' . $remaining_time[1] : 'Ошибка: Времени' ?>
+                            <?= (isset($remaining_time[0], $remaining_time[1])) ? $remaining_time[0] . ':' . $remaining_time[1] : 'Ошибка: Времени' ?>
                         </div>
                     </div>
                 </div>

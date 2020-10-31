@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 
 session_start();
@@ -18,12 +19,12 @@ if (!$connection) {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $limit = 9;
     $page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT);
-    if(!$page || !isset($page)){
+    if (!$page || !isset($page)) {
         $page = 1;
     }
     $offset = ($page - 1) * $limit;
     $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
-    if(!$search || !isset($search)){
+    if (!$search || !isset($search)) {
         $search = "";
     } else {
         $search = trim($search);
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($num_items['FOUND_ROWS()'])) {
             $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
         }
-        $pages = get_nav_pages($page,$num_pages);
+        $pages = get_nav_pages($page, $num_pages);
     }
 }
 
