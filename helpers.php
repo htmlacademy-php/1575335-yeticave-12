@@ -310,7 +310,7 @@ function image_validation_errors(string $field_name, array $allowed_mime_types):
 /**
  * Сохраняет изображение в папку /uploads/ не изменяя имени файла.
  * @param string $field_name Имя поля изображения
- * @return string|false Возвращает url сохраненного изображения или возвращает false в случае ошибки
+ * @return string|boolean Возвращает url сохраненного изображения или возвращает false в случае ошибки
  **/
 function save_image(string $field_name)
 {
