@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in']) {
@@ -10,20 +11,20 @@ $categories = get_categories();
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
 if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
-            return validate_email('email');
+            return email_validation_errors('email');
         },
         'password' => function () {
-            return validate_password('password');
+            return password_validation_errors('password');
         },
         'name' => function () {
-            return validate_username('name');
+            return username_validation_errors('name');
         },
         'message' => function () {
-            return validate_filled('message');
+            return required_field_validation_errors('message');
         }
     ];
 
@@ -43,11 +44,10 @@ if (!$connection) {
             [strtolower($_POST['email']), $_POST['name'], $password_hash, $_POST['message']]);
 
         if (mysqli_stmt_execute($prepared_sql)) {
-            header("Location: /pages/login.html");
+            header("Location: /login.php");
             die();
-        } else {
-            print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
         }
+        print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
     }
 }
 

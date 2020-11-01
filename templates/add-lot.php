@@ -16,8 +16,8 @@ form--invalid
             <select id="category" name="category">
                 <option>Выберите категорию</option>
                 <?php foreach ($categories as $category): ?>
-                    <option value="<?= htmlspecialchars($category['category_id']) ?>"
-                        <?php if (get_post_val('category') == $category['category_id']): ?>
+                    <option value="<?= htmlspecialchars($category['category_id'] ?? 'Invalid ID') ?>"
+                        <?php if (isset($category['category_id']) && get_post_val('category') === ($category['category_id'])): ?>
                             selected="selected"
                         <?php endif; ?>
                     >

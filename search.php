@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 
 session_start();
@@ -17,11 +18,17 @@ if (!$connection) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $limit = 9;
-    $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT) ?? 1;
+    $page = (int)filter_input(INPUT_GET, 'page', FILTER_SANITIZE_NUMBER_INT);
+    if (!$page || !isset($page)) {
+        $page = 1;
+    }
     $offset = ($page - 1) * $limit;
-    $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING) ?? "";
-    $search = trim($search);
-
+    $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING);
+    if (!$search || !isset($search)) {
+        $search = "";
+    } else {
+        $search = trim($search);
+    }
     if (strlen($search) > 0) {
         $sql_search = "SELECT SQL_CALC_FOUND_ROWS lot_id, date_created, lot_name, img_url, starting_price, date_end, cats.name AS category
         FROM lots
@@ -43,22 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $result = mysqli_stmt_get_result($search_result);
         $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
         $num_items = mysqli_fetch_assoc(mysqli_query($connection, $sql_num_items));
-        $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
-
-        switch ($page) {
-            case $num_pages:
-                $pages = [$page - 1, $page, null];
-                break;
-            case 1:
-                $pages = [null, $page, $page + 1];
-                break;
-            default:
-                $pages = [$page - 1, $page, $page + 1];
-                break;
+        if (isset($num_items['FOUND_ROWS()'])) {
+            $num_pages = ceil($num_items['FOUND_ROWS()'] / $limit);
         }
-        if ($num_pages <= 1) {
-            $pages = [];
-        }
+        $pages = get_nav_pages($page, $num_pages);
     }
 }
 

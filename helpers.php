@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
  *
@@ -163,7 +164,7 @@ function format_price(float $price): string
 /**
  * Возвращает оставшееся до переданной в функцию даты время в виде массива [ЧЧ, ММ]
  * @param string $future_date Конечная дата в формате 'ГГГГ-ММ-ДД'
- * @return array|null Возвращает массив строк в формате [ЧЧ, ММ] или ничего не возращает если входной параметр имеет неверный формат, если конечная дата в прошлом, возвращает ['00', '00'].
+ * @return array|null Возвращает массив строк в формате [ЧЧ, ММ], если конечная дата в прошлом, возвращает ['00', '00']. Ничего не возращает если входной параметр имеет неверный формат.
  */
 
 function get_time_remaining(string $future_date): ?array
@@ -175,10 +176,10 @@ function get_time_remaining(string $future_date): ?array
         if ($diff < 0) {
             return ['00', '00'];
         }
-        $hours = floor($diff / 3600);
-        $minutes = ceil(($diff % 3600) / 60);
+        $hours = (int)floor($diff / 3600);
+        $minutes = (int)ceil(($diff % 3600) / 60);
 
-        if ($minutes == 60) {
+        if ($minutes === 60) {
             $hours += 1;
             $minutes = 0;
         }
@@ -201,7 +202,6 @@ function send_status_404_page(string $path): void
     http_response_code(404);
     readfile($path);
     die();
-
 }
 
 /**
@@ -209,7 +209,7 @@ function send_status_404_page(string $path): void
  * @param string $field_name Имя поля
  * @return string|null Ошибка валидации или null если ошибок нет
  **/
-function validate_filled(string $field_name): ?string
+function required_field_validation_errors(string $field_name): ?string
 {
     if (empty($_POST[$field_name])) {
         return "Это поле должно быть заполнено";
@@ -222,17 +222,16 @@ function validate_filled(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_starting_price(string $field_name): ?string
+function starting_price_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
-    } else {
-        if (!is_numeric($_POST[$field_name])) {
-            return 'Начальная цена должна быть числом';
-        } elseif ($_POST[$field_name] <= 0) {
-            return 'Начальная цена должна быть больше нуля';
-        }
+    } elseif (!is_numeric($_POST[$field_name])) {
+        return 'Начальная цена должна быть числом';
+    } elseif ($_POST[$field_name] <= 0) {
+        return 'Начальная цена должна быть больше нуля';
     }
+
     return null;
 }
 
@@ -241,11 +240,11 @@ function validate_starting_price(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_date_end(string $field_name): ?string
+function date_end_validation_errors(string $field_name): ?string
 {
     $tomorrow_date = date_create('tomorrow');
 
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_date_valid($_POST[$field_name])) {
         return 'Неккоректный формат даты';
@@ -260,27 +259,28 @@ function validate_date_end(string $field_name): ?string
  * @param string $field_name Имя поля
  * @return string|null Причина ошибки валидации или null если ошибок нет
  **/
-function validate_step(string $field_name): ?string
+function step_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом';
-    } elseif ($_POST[$field_name] <= 0) {
+    } elseif ((int)$_POST[$field_name] <= 0) {
         return 'Шаг ставки должен быть больше ноля';
     }
     return null;
 }
 
-/* Функция валидации категории, если категория равна "Выберите категорию" валидация не пройдена.
-*  @param string $field_name Имя поля
-*  @return string|null Причина ошибки валидации или null если ошибок нет
-**/
-function validate_category(string $field_name): ?string
+/**
+ *  Функция валидации категории, если категория равна "Выберите категорию" валидация не пройдена.
+ * @param string $field_name Имя поля
+ * @return string|null Причина ошибки валидации или null если ошибок нет
+ **/
+function lot_category_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
-    } elseif ($_POST[$field_name] == 'Выберите категорию') {
+    } elseif ($_POST[$field_name] === 'Выберите категорию') {
         return "Выберите категорию";
     }
     return null;
@@ -292,19 +292,17 @@ function validate_category(string $field_name): ?string
  * @param array $allowed_mime_types Массив строк с разрешенным MIME типами изображений
  * @return string|null Причина ошибки валидации
  **/
-function validate_image(string $field_name, array $allowed_mime_types): ?string
+function image_validation_errors(string $field_name, array $allowed_mime_types): ?string
 {
-    if (isset($_FILES[$field_name])) {
-        if ($_FILES[$field_name]['error'] == 4) {
-            return 'Добавьте изображение лота';
-        }
-        finfo_open(FILEINFO_MIME_TYPE);
-        $path = $_FILES[$field_name]['tmp_name'];
-        $mime_type = mime_content_type($path);
+    if (!isset($_FILES[$field_name]) || !isset($_FILES[$field_name]['tmp_name']) || (isset($_FILES[$field_name]['error']) && $_FILES[$field_name]['error'] === 4)) {
+        return 'Добавьте изображение лота';
+    }
+    finfo_open(FILEINFO_MIME_TYPE);
+    $path = $_FILES[$field_name]['tmp_name'];
+    $mime_type = mime_content_type($path);
 
-        if (!in_array($mime_type, $allowed_mime_types)) {
-            return 'Изображение должно быть в одном из следующих форматов: ' . implode(", ", $allowed_mime_types);
-        }
+    if (!in_array($mime_type, $allowed_mime_types)) {
+        return 'Изображение должно быть в одном из следующих форматов: ' . implode(", ", $allowed_mime_types);
     }
     return null;
 }
@@ -312,20 +310,21 @@ function validate_image(string $field_name, array $allowed_mime_types): ?string
 /**
  * Сохраняет изображение в папку /uploads/ не изменяя имени файла.
  * @param string $field_name Имя поля изображения
- * @return string|null Возвращает url сохраненного изображения или не возвращает ничего в случае ошибки
+ * @return string|boolean Возвращает url сохраненного изображения или возвращает false в случае ошибки
  **/
-function save_image(string $field_name): ?string
+function save_image(string $field_name)
 {
-    if (isset($_FILES[$field_name])) {
+    if (isset($_FILES[$field_name]) && isset($_FILES[$field_name]['name'])) {
         $file_name = $_FILES[$field_name]['name'];
         $file_path = __DIR__ . '/uploads/';
         $file_url = '/uploads/' . $file_name;
 
-        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $file_path . $file_name)) {
+        if (isset($_FILES[$field_name]['tmp_name']) && move_uploaded_file($_FILES[$field_name]['tmp_name'],
+                $file_path . $file_name)) {
             return $file_url;
         }
     }
-    return null;
+    return false;
 }
 
 /**
@@ -343,9 +342,9 @@ function get_post_val(string $field_name)
  * @param string $field_name имя поля формы
  * @return string|null Ошибка валидации/ошибка подключения или не возвращает ничего
  **/
-function validate_username(string $field_name): ?string
+function username_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
     if (!$connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db')) {
@@ -369,9 +368,9 @@ function validate_username(string $field_name): ?string
  * @param string $field_name Имя поля формы
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  **/
-function validate_password(string $field_name): ?string
+function password_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (strlen($_POST[$field_name]) < 8) {
         return 'Минимальная длина пароля 8 символов';
@@ -385,9 +384,9 @@ function validate_password(string $field_name): ?string
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  *
  **/
-function validate_email(string $field_name): ?string
+function email_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
 
@@ -431,7 +430,7 @@ function get_categories(): array
     if (!$categories_res) {
         return [];
     }
-    return $categories = mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
+    return mysqli_fetch_all($categories_res, MYSQLI_ASSOC);
 }
 
 /**
@@ -439,9 +438,9 @@ function get_categories(): array
  * @param string $field_name Имя поля формы, в котором находится строка адреса
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  */
-function validate_email_login(string $field_name): ?string
+function login_email_validation_errors(string $field_name): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     }
 
@@ -457,14 +456,14 @@ function validate_email_login(string $field_name): ?string
  * @param int $min_bid Минимальный размер ставки
  * @return string|null Возвращает ошибку валидации или не возращает ничего в случае отсутствия ошибок
  **/
-function validate_bid(string $field_name, int $min_bid): ?string
+function bid_validation_errors(string $field_name, int $min_bid): ?string
 {
-    if ($empty = validate_filled($field_name)) {
+    if ($empty = required_field_validation_errors($field_name)) {
         return $empty;
     } elseif (!is_numeric($_POST[$field_name]) || !ctype_digit($_POST[$field_name])) {
         return 'Шаг ставки должен быть целым числом больше ноля';
-    } elseif ($_POST[$field_name] < $min_bid / 100) {
-        return 'Ставка должна быть больше минимальной ставки';
+    } elseif ((int)$_POST[$field_name] * 100 < $min_bid) {
+        return 'Ставка должна быть больше или равна минимальной ставке';
     }
 
     return null;
@@ -499,10 +498,8 @@ function human_readable_datetime(string $date): ?string
         $format[] = "%i " . get_noun_plural_form($difference->i, 'минуту', 'минуты', 'минут');
     }
 
-    if ($difference->s !== 0) {
-        if (count($format) == 0) {
-            return "Меньше минуты назад";
-        }
+    if ($difference->s !== 0 && count($format) === 0) {
+        return "Меньше минуты назад";
     }
 
     if ($difference->format('%d.%m.%y %H:%i:%s') === "0.0.0 00:0:0") {
@@ -511,4 +508,26 @@ function human_readable_datetime(string $date): ?string
 
     $format = array_shift($format) . ' назад';
     return $difference->format($format);
+}
+
+/**
+ * Функция возвращает массив номеров страниц для навигации
+ * @param int $page номер текущей страницы
+ * @param int $num_pages общее количество страниц
+ * @return array массив вида [предыдущая страница, текущая страница, следующая страница],
+ * предыдущая страница и слудующая страница могут быть null, в случае отсутствия страниц вовзращает пустой массив
+ */
+function get_nav_pages(int $page, int $num_pages): array
+{
+    if ($num_pages <= 1) {
+        return [];
+    }
+    switch ($page) {
+        case $num_pages:
+            return [$page - 1, $page, null];
+        case 1:
+            return [null, $page, $page + 1];
+        default:
+            return [$page - 1, $page, $page + 1];
+    }
 }

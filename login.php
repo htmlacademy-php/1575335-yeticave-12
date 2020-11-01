@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 $errors = [];
 session_start();
@@ -13,14 +14,14 @@ if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $rules = [
         'email' => function () {
-            return validate_email_login('email');
+            return login_email_validation_errors('email');
         },
         'password' => function () {
-            return validate_filled('password');
+            return required_field_validation_errors('password');
         }
     ];
 
@@ -40,11 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_stmt_execute($prepared_sql);
         $prepared_res = mysqli_stmt_get_result($prepared_sql);
         $result = mysqli_fetch_all($prepared_res, MYSQLI_ASSOC);
-        if (empty($result)) {
+        if (empty($result) || !password_verify($_POST['password'], $result[0]['password'])) {
             $errors['password'] = 'Вы ввели неверный email/пароль';
-        } elseif (!password_verify($_POST['password'], $result[0]['password'])) {
-            $errors['password'] = 'Вы ввели неверный email/пароль';
-        } else {
+        } elseif (isset($result[0]['user_name'], $result[0]['user_id'])) {
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_name'] = $result[0]['user_name'];
             $_SESSION['user_id'] = $result[0]['user_id'];

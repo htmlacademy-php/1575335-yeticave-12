@@ -1,4 +1,5 @@
 <?php
+
 require './helpers.php';
 session_start();
 if (!isset($_SESSION['user_logged_in'])) {
@@ -6,34 +7,34 @@ if (!isset($_SESSION['user_logged_in'])) {
     die();
 }
 
-$is_auth = $_SESSION['user_logged_in'] ?? false;
+$is_auth = $_SESSION['user_logged_in'];
 $user_name = $_SESSION['user_name'] ?? "";
-$user_id = $_SESSION['user_id'] ?? 0;
+$user_id = $_SESSION['user_id'] ?? -1;
 $connection = mysqli_connect('localhost', 'root', 'root', 'yeti_cave_db');
 $categories = get_categories();
 $errors = [];
 if (!$connection) {
     print('Ошибка подключения к БД: ' . mysqli_connect_error());
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['lot-name', 'category', 'message', 'lot-rate', 'lot-step', 'lot-date'];
     $rules = [
         'lot-name' => function () {
-            return validate_filled('lot-name');
+            return required_field_validation_errors('lot-name');
         },
         'category' => function () {
-            return validate_category('category');
+            return lot_category_validation_errors('category');
         },
         'message' => function () {
-            return validate_filled('message');
+            return required_field_validation_errors('message');
         },
         'lot-rate' => function () {
-            return validate_starting_price('lot-rate');
+            return starting_price_validation_errors('lot-rate');
         },
         'lot-step' => function () {
-            return validate_step('lot-step');
+            return step_validation_errors('lot-step');
         },
         'lot-date' => function () {
-            return validate_date_end('lot-date');
+            return date_end_validation_errors('lot-date');
         }
     ];
 
@@ -44,14 +45,14 @@ if (!$connection) {
         }
     }
 
-    $errors['lot-img'] = validate_image('lot-img', ['image/png', 'image/jpeg']);
+    $errors['lot-img'] = image_validation_errors('lot-img', ['image/png', 'image/jpeg']);
     $errors = array_filter($errors);
 
-    if (count($errors) == 0 && $connection && isset($categories) && $file_url = save_image('lot-img')) {
+    if ($connection && isset($categories) && count($errors) === 0 && $file_url = save_image('lot-img')) {
         mysqli_set_charset($connection, "utf8");
 
         $sql_add_lot = "INSERT INTO lots (lot_name, lot_description, img_url, date_end, starting_price, rate, author_id, category_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $prepared_sql = db_get_prepare_stmt($connection, $sql_add_lot, [
             $_POST['lot-name'],
             $_POST['message'],
@@ -68,9 +69,8 @@ if (!$connection) {
             $last_id = mysqli_insert_id($connection);
             header("Location: /lot.php?id=$last_id");
             die();
-        } else {
-            print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
         }
+        print 'Ошибка запроса на сохранение данных ' . mysqli_error($connection);
     }
 }
 

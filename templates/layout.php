@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= $title ?></title>
+    <title><?= htmlspecialchars($title) ?></title>
     <link href="../css/normalize.min.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet">
     <?php if (isset($third_css)): ?>
@@ -28,7 +28,7 @@
             <nav class="user-menu">
                 <?php if ($is_auth): ?>
                     <div class="user-menu__logged">
-                        <p><?= $user_name ?></p>
+                        <p><?= htmlspecialchars($user_name) ?></p>
                         <a class="user-menu__bets" href="mybids.php">Мои ставки</a>
                         <a class="user-menu__logout" href="logout.php">Выход</a>
                     </div>
@@ -41,7 +41,7 @@
                             <a href="login.php">Вход</a>
                         </li>
                     </ul>
-                <? endif; ?>
+                <?php endif; ?>
                 <!-- здесь должен быть PHP код для показа меню и данных пользователя -->
 
             </nav>
@@ -54,7 +54,7 @@
                 <ul class="nav__list container">
                     <?php foreach ($categories as $category): ?>
                         <li class="nav__item">
-                            <a href="pages/all-lots.html"><?= htmlspecialchars($category['name']) ?></a>
+                            <a href="category.php?id=<?= $category['category_id'] ?? 0 ?>"><?= htmlspecialchars($category['name'] ?? 'Категория') ?></a>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -70,14 +70,14 @@
             <!--заполните этот список из массива категорий-->
             <?php foreach ($categories as $category): ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?= htmlspecialchars($category['name']) ?></a>
+                    <a href="category.php?id=<?= $category['category_id'] ?? 0 ?>"><?= htmlspecialchars($category['name'] ?? 'Категория') ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
     </nav>
     <div class="main-footer__bottom container">
         <div class="main-footer__copyright">
-            <p>© 2019, YetiCave</p>
+            <p>© 2020, YetiCave</p>
             <p>Интернет-аукцион сноубордического и горнолыжного снаряжения</p>
         </div>
         <div class="main-footer__social social">
